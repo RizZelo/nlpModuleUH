@@ -169,7 +169,8 @@ async def analyze(
             "total_characters": len(text),
             "word_count": word_count,
             "line_count": line_count,
-            "preview": text[:200] + "..." if len(text) > 200 else text
+            "preview": text[:500] + "..." if len(text) > 500 else text,
+            "full_text": text  # ✅ ADD THIS - full extracted text
         },
         "job_description_length": len(job_description),
         "file_info": file_info if cv_file else {"source": "raw_text"}

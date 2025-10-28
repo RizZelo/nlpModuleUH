@@ -46,6 +46,13 @@ export default function CVAnalyzer() {
       setLoading(false);
       return;
     }
+    // ✅ IMPORTANT: Extract the parsed CV text from backend response
+    const extractedCvText = data.cv_stats?.full_text || cvText;
+    
+    // Update cvText with the parsed content from the file
+    if (cvFile && extractedCvText) {
+      setCvText(extractedCvText);
+    }
 
     const geminiData = data.gemini_analysis?.analysis;
     

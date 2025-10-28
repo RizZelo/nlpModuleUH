@@ -1,0 +1,45 @@
+{
+  "status": "success",
+  "analysis": {
+    "formatting": {
+      "score": 7,
+      "issues": [
+        "Lack of visual hierarchy; headings could be more prominent.",
+        "Inconsistent date formatting (Year only for IndabaX but month/year for education).",
+        "Bullet points are sometimes missing periods at the end."
+      ],
+      "suggestions": [
+        "Use a clear font hierarchy to distinguish between headings, subheadings, and body text. Increase the font size or boldness of headings.",
+        "Standardize the date formatting across all sections (e.g., MM/YYYY - MM/YYYY or YYYY - YYYY).",
+        "Ensure all bullet points in project and competition descriptions end with a period for consistency."
+      ]
+    },
+    "content": {
+      "score": 6,
+      "strengths": [
+        "Quantifiable achievements (e.g., 'placed 7th').",
+        "Relevant skills (Python, SQL).",
+        "Demonstrated project leadership experience as technical manager."
+      ],
+      "weaknesses": [
+        "Limited direct experience with server-side technologies mentioned in the job description (Node.js, Django, Spring Boot, specific SQL/NoSQL databases).",
+        "Skills listed as 'Beginner' (Machine Learning, Deep Learning) are not particularly relevant to the server-side focus.",
+        "Missing focus on database design or optimization."
+      ],
+      "suggestions": [
+        "Tailor the projects section to highlight any aspect of the existing projects that demonstrate relevant skills, even indirectly (e.g., scalability considerations, API interactions).",
+        "Consider adding a small personal project related to the desired server-side skills using the technologies mentioned in the job description to show initiative and interest.",
+        "In the summary, emphasize problem-solving abilities and adaptability, highlighting the potential to quickly learn new technologies required for the role."
+      ]
+    },
+    "general": {
+      "overall_score": 6,
+      "summary": "The CV shows promise with its technical project and competition experience. However, it needs to be better tailored to highlight relevant skills and experience for a server-side development internship and address key technologies required for this role. Adding a small personal server-side project and refining the summary to emphasize adaptability are crucial.",
+      "top_priorities": [
+        "Add a server-side focused project, however small.",
+        "Tailor project descriptions to highlight relevance to server-side development.",
+        "Emphasize willingness to learn new technologies."
+      ]
+    }
+  }
+}

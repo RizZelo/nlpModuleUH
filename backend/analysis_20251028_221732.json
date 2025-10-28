@@ -1,0 +1,45 @@
+{
+  "status": "success",
+  "analysis": {
+    "formatting": {
+      "score": 7,
+      "issues": [
+        "Inconsistent use of bullet points or consistent formatting for project and experience descriptions.",
+        "Dates in professional experiences are not fully written (2025 instead of the whole period).",
+        "Inconsistent capitalization and punctuation in section titles (e.g., 'COMPÉTENCES' vs. 'Education')."
+      ],
+      "suggestions": [
+        "Use bullet points or consistent indentation to delineate responsibilities and achievements within each role/project for better readability.",
+        "Always include full dates when listing experiences. E.g., July-August 2023, NOT just August 2023",
+        "Ensure all section titles have consistent capitalization (e.g., title case or all caps) and punctuation."
+      ]
+    },
+    "content": {
+      "score": 6,
+      "strengths": [
+        "Demonstrates a wide range of technical skills relevant to software development (multiple programming languages, database management, web development).",
+        "Includes a variety of projects that showcase practical application of skills (antenna design, system authentication, database management).",
+        "Highlights involvement in extracurricular activities and certifications, indicating a commitment to continuous learning and professional development."
+      ],
+      "weaknesses": [
+        "Lacks specific examples of server-side development experience (Node.js, Django/Spring Boot) directly relevant to the job description.",
+        "Does not quantify achievements or demonstrate the impact of projects (e.g., scale of database, performance improvements).",
+        "Missing clear evidence of experience with system architecture, scalability, cloud deployment, and API management as required by the job description."
+      ],
+      "suggestions": [
+        "Explicitly mention any server-side projects, even if they are small or academic, highlighting the technologies used and the outcomes achieved.",
+        "Quantify achievements whenever possible (e.g., 'Improved query performance by X%' or 'Handled Y users in our application').",
+        "Tailor the 'Projects' and 'Skills' sections to directly address the key requirements of the server-side developer job description. Highlight experience with databases, system architecture, scaling, and API development."
+      ]
+    },
+    "general": {
+      "overall_score": 6,
+      "summary": "The CV shows promise with a broad range of technical skills and projects. However, it needs to be tailored more specifically to the server-side development job description to highlight relevant experience and demonstrate the impact of projects.",
+      "top_priorities": [
+        "Tailor the CV to directly address the key requirements of the server-side developer job description by adding keywords, relevant projects and quantifying achievements.",
+        "Provide specific examples of server-side development experience using the technologies mentioned in the job description.",
+        "Improve the formatting for enhanced readability and consistency."
+      ]
+    }
+  }
+}

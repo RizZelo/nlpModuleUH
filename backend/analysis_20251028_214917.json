@@ -1,0 +1,45 @@
+{
+  "status": "success",
+  "analysis": {
+    "formatting": {
+      "score": 8,
+      "issues": [
+        "Inconsistent date format (MM/YYYY vs. YYYY-YYYY).",
+        "Lack of consistent bullet point usage.",
+        "Missing location information (city, country) for competitions."
+      ],
+      "suggestions": [
+        "Standardize date formats (e.g., MM/YYYY or YYYY-MM).",
+        "Use consistent bullet points throughout, especially within job descriptions.",
+        "Add location information to each competition to provide context."
+      ]
+    },
+    "content": {
+      "score": 6,
+      "strengths": [
+        "Quantifiable achievement in the hackathon (7th place).",
+        "Clear demonstration of web development skills through the IndabaX website.",
+        "Demonstrated teamwork and problem-solving abilities."
+      ],
+      "weaknesses": [
+        "Limited evidence of server-side development experience directly aligned with the job description.",
+        "Beginner level in Machine Learning/Deep Learning, which is not emphasized in the job description.",
+        "Lack of projects demonstrating database management skills (SQL schema design, optimization)."
+      ],
+      "suggestions": [
+        "Highlight any personal projects or coursework involving server-side technologies mentioned in the job description (Node.js, Django, Spring Boot). Even small projects can demonstrate initiative.",
+        "Include quantifiable metrics related to the IndabaX website development, such as website traffic or user engagement.",
+        "Create a small personal project involving a database and API integration to showcase relevant skills. Describe this project in the 'Selected Projects' section."
+      ]
+    },
+    "general": {
+      "overall_score": 6,
+      "summary": "The CV showcases web development and problem-solving skills but needs stronger evidence of server-side development and database management experience to align with the job description. Prioritizing relevant skills and adding demonstrable experience will significantly improve its impact.",
+      "top_priorities": [
+        "Highlight server-side development experience (even small projects).",
+        "Demonstrate database management skills through a relevant project.",
+        "Tailor the 'Skills' section to emphasize technologies mentioned in the job description, showcasing depth over breadth."
+      ]
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "status": "success",
+  "analysis": {
+    "formatting": {
+      "score": 8,
+      "issues": [
+        "The use of bullet points is inconsistent. Some sections use it, others don't.",
+        "The date format in education lacks consistency. Consider using a more formal format or at least ensure the same format is used throughout."
+      ],
+      "suggestions": [
+        "Standardize the use of bullet points across all sections, particularly in skills and selected projects, to maintain visual consistency and readability.",
+        "Adopt a consistent and standard date format (e.g., MM/YYYY - MM/YYYY) to ensure uniformity."
+      ]
+    },
+    "content": {
+      "score": 6,
+      "strengths": [
+        "Demonstrates experience with relevant technologies like Python, SQL, HTML, CSS, and JavaScript, aligning with some of the job description's requirements.",
+        "Highlights project experience, specifically the IndabaX Tunisia website development, showcasing practical application of skills."
+      ],
+      "weaknesses": [
+        "The resume lacks detail on server-side development skills and experience which is the focus of the job description. No mention of Node.js, Django, or Spring Boot.",
+        "Limited quantifiable results are presented. While involvement in hackathons is mentioned, the specific contributions and impact are not clearly articulated."
+      ],
+      "suggestions": [
+        "Quantify achievements whenever possible. Instead of stating 'Implemented SEO best practices,' provide specific results, such as 'Increased website traffic by X% through SEO optimization.'",
+        "If possible, create a small personal project showcasing server-side development skills and include it in the resume. This would directly address the key requirements of the job."
+      ]
+    },
+    "general": {
+      "overall_score": 6,
+      "summary": "The resume presents a good foundation but needs significant adjustments to better align with the specific requirements of the server-side development role. It highlights relevant technologies but lacks demonstrable experience in the core server-side skills mentioned in the job description.",
+      "top_priorities": [
+        "Quantify accomplishments with metrics to demonstrate impact.",
+        "Showcase server-side development skills through a personal project or additional relevant experience.",
+        "Tailor the resume to explicitly address the key requirements and keywords from the job description (e.g., Node.js, Django, API development)."
+      ]
+    }
+  }
+}
