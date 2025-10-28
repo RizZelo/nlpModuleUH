@@ -23,43 +23,75 @@ export default function CVAnalyzer() {
   };
 
   const handleAnalyze = async () => {
-    setLoading(true);
-  
-    const formData = new FormData();
-    if (cvFile) {
-      formData.append("cv_file", cvFile);
-    } else {
+  setLoading(true);
+
+  const formData = new FormData();
+  if (cvFile) {
+    formData.append("cv_file", cvFile);
+  } else {
     formData.append("cv_text", cvText);
+  }
+  formData.append("job_description", jobDesc);
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/analyze", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+    
+    if (data.gemini_analysis?.error) {
+      alert("Gemini Error: " + data.gemini_analysis.error);
+      setLoading(false);
+      return;
     }
-    formData.append("job_description", jobDesc);
 
-    try {
-      const response = await fetch("http://127.0.0.1:8000/analyze", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-        if (data.gemini_analysis?.error) {
-          alert("Gemini Error: " + data.gemini_analysis.error);
+    const geminiData = data.gemini_analysis?.analysis;
+    
+    setAnalysis({
+      general: {
+        summary: geminiData?.general?.summary || "No analysis received.",
+        overallGrade: geminiData?.general?.overall_score || 0,
+        formattingGrade: geminiData?.formatting?.score || 0,
+        contentGrade: geminiData?.content?.score || 0,
+      },
+      flags: [
+        // Convert issues to flags
+        ...((geminiData?.formatting?.issues || []).map(issue => ({
+          type: 'warning',
+          message: `Formatting: ${issue}`
+        }))),
+        ...((geminiData?.content?.weaknesses || []).map(weakness => ({
+          type: 'error',
+          message: `Content: ${weakness}`
+        })))
+      ],
+      recommendations: geminiData?.general?.top_priorities || [],
+      categories: [
+        {
+          name: "Formatting",
+          score: geminiData?.formatting?.score || 0,
+          good: [], // Formatting doesn't have "good" items in our structure
+          bad: geminiData?.formatting?.issues || [],
+          suggestions: geminiData?.formatting?.suggestions || []
+        },
+        {
+          name: "Content Quality",
+          score: geminiData?.content?.score || 0,
+          good: geminiData?.content?.strengths || [],
+          bad: geminiData?.content?.weaknesses || [],
+          suggestions: geminiData?.content?.suggestions || []
         }
-        setAnalysis({
-          general: {
-            summary: data.gemini_analysis?.analysis || data.summary || "No analysis received.",
-            overallGrade: 7.5,
-            formattingGrade: 8.0,
-            contentGrade: 6.5,
-          },
-          flags: [],
-          recommendations: [],
-          categories: [],
-        });
-    }   catch (error) {
-      console.error("Error analyzing CV:", error);
-    }
+      ],
+    });
+  } catch (error) {
+    console.error("Error analyzing CV:", error);
+    alert("Failed to analyze CV. Please try again.");
+  }
 
-    setLoading(false);
-  };
+  setLoading(false);
+};
 
   const getGradeColor = (grade) => {
     if (grade >= 8) return 'text-green-600';

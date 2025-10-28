@@ -1,0 +1,41 @@
+{
+  "status": "success",
+  "analysis": {
+    "formatting": {
+      "score": 7,
+      "issues": [
+        "Lack of consistent date formatting (e.g., 09/2024 vs. 2024-2025)",
+        "Inconsistent bullet point usage in the Education section"
+      ],
+      "suggestions": [
+        "Standardize date formats throughout the CV (e.g., MM/YYYY or Month YYYY)",
+        "Use bullet points consistently for listing items in all sections."
+      ]
+    },
+    "content": {
+      "score": 6,
+      "strengths": [
+        "Demonstrates experience with relevant technologies (HTML, CSS, JavaScript, Python, SQL).",
+        "Quantifiable achievements in the hackathon (placed 7th) and website development (technical manager)."
+      ],
+      "weaknesses": [
+        "Limited depth of experience in server-side development technologies mentioned in the job description (Node.js, Django, Spring Boot).",
+        "Lacks concrete examples of experience with database design, system architecture, or testing methodologies."
+      ],
+      "suggestions": [
+        "Expand on projects or coursework that demonstrate skills related to server-side development, database management, and system architecture.",
+        "Quantify the impact of SEO best practices implemented on the IndabaX Tunisia 2025 website (e.g., increase in website traffic).",
+        "Add a section detailing relevant coursework which involves technologies mentioned in the job description."
+      ]
+    },
+    "general": {
+      "overall_score": 6,
+      "summary": "The CV showcases potential with relevant skills and project experience, but it needs to be tailored to the specific requirements of the server-side development role. Highlighting server-side experience and quantifying achievements would significantly improve its impact.",
+      "top_priorities": [
+        "Expand on server-side development experience and technologies.",
+        "Provide concrete examples of database design and optimization skills.",
+        "Quantify achievements and demonstrate impact in project descriptions."
+      ]
+    }
+  }
+}
