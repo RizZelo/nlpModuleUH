@@ -1,12 +1,29 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from parser import parse_document  # your parser.py file
+from gemini_api import analyze_cv_with_gemini  # Gemini integration
+from google import generativeai as genai
 import tempfile
 import os
 import json
 from datetime import datetime
+from dotenv import load_dotenv
+load_dotenv()
+# Suppress gRPC warnings
+os.environ['GRPC_VERBOSITY'] = 'ERROR'
+os.environ['GLOG_minloglevel'] = '2'
 
 app = FastAPI()
+
+# ⚠️ IMPORTANT: Set your Gemini API key here or use environment variable
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_API_KEY_HERE")
+
+# Choose your Gemini model:
+# - "gemini-2.0-flash-exp" (latest, fastest, recommended)
+# - "gemini-1.5-pro" (best quality, slower)
+# - "gemini-1.5-flash" (good balance)
+GEMINI_MODEL = genai.GenerativeModel(model_name="gemini-2.5-flash")
+
 
 # Allow requests from your React frontend
 app.add_middleware(
@@ -21,10 +38,11 @@ app.add_middleware(
 async def analyze(
     cv_file: UploadFile = File(None),
     cv_text: str = Form(None),
-    job_description: str = Form(...)
+    job_description: str = Form(...),
+    use_gemini: bool = Form(True)  # Toggle Gemini analysis
 ):
     """
-    Handle CV file upload or raw text and save to JSON for Gemini API
+    Handle CV file upload or raw text, save to JSON, and analyze with Gemini
     """
     
     print("\n" + "="*50)
@@ -98,7 +116,7 @@ async def analyze(
     print(f"   - Word count: {word_count}")
     print(f"   - Line count: {line_count}")
     
-    # Create JSON data structure for Gemini API
+    # Create JSON data structure
     cv_data = {
         "timestamp": datetime.now().isoformat(),
         "cv_text": text,
@@ -119,34 +137,60 @@ async def analyze(
             json.dump(cv_data, f, indent=2, ensure_ascii=False)
         
         print(f"\n💾 Saved CV data to: {output_filename}")
-        print(f"✅ Ready for Gemini API!")
         print("="*50 + "\n")
         
-        # Return response to frontend
-        return {
-            "summary": f"CV successfully processed! Extracted {len(text)} characters from your CV.",
-            "status": "success",
-            "saved_to_file": output_filename,
-            "cv_stats": {
-                "total_characters": len(text),
-                "word_count": word_count,
-                "line_count": line_count,
-                "preview": text[:200] + "..." if len(text) > 200 else text
-            },
-            "job_description_length": len(job_description),
-            "file_info": file_info if cv_file else {"source": "raw_text"},
-            "message": "Data saved to JSON file for Gemini API processing"
-        }
-    
     except Exception as e:
         print(f"❌ Error saving JSON: {str(e)}")
         return {"error": f"Failed to save JSON: {str(e)}"}
+    
+    # Analyze with Gemini if requested
+    gemini_analysis = None
+    if use_gemini:
+        print("⚠️  Gemini API key: ", GEMINI_API_KEY)
+        
+        print("🤖 Analyzing CV with Gemini...")
+        gemini_analysis = analyze_cv_with_gemini(text, job_description, GEMINI_API_KEY)
+        
+        # Save Gemini analysis to separate file
+        if gemini_analysis and 'error' not in gemini_analysis:
+            analysis_filename = f"analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            with open(analysis_filename, 'w', encoding='utf-8') as f:
+                json.dump(gemini_analysis, f, indent=2, ensure_ascii=False)
+            print(f"💾 Saved Gemini analysis to: {analysis_filename}")
+        else:
+            print("hello");    
+    
+    # Return response to frontend
+    response = {
+        "summary": f"CV successfully processed! Extracted {len(text)} characters.",
+        "status": "success",
+        "saved_to_file": output_filename,
+        "cv_stats": {
+            "total_characters": len(text),
+            "word_count": word_count,
+            "line_count": line_count,
+            "preview": text[:200] + "..." if len(text) > 200 else text
+        },
+        "job_description_length": len(job_description),
+        "file_info": file_info if cv_file else {"source": "raw_text"}
+    }
+    
+    # Add Gemini analysis to response if available
+    print(gemini_analysis)
+    if gemini_analysis:
+        response["gemini_analysis"] = gemini_analysis
+    
+    return response
 
 
 @app.get("/")
 async def root():
     """Health check endpoint"""
-    return {"status": "API is running!", "message": "Use POST /analyze to process CVs"}
+    return {
+        "status": "API is running!",
+        "message": "Use POST /analyze to process CVs",
+        "gemini_configured": GEMINI_API_KEY != "YOUR_API_KEY_HERE"
+    }
 
 
 @app.get("/latest-cv")
@@ -172,3 +216,28 @@ async def get_latest_cv():
     
     except Exception as e:
         return {"error": f"Failed to read CV data: {str(e)}"}
+
+
+@app.get("/latest-analysis")
+async def get_latest_analysis():
+    """Get the most recent Gemini analysis"""
+    try:
+        # Find all analysis files
+        analysis_files = [f for f in os.listdir('.') if f.startswith('analysis_') and f.endswith('.json')]
+        
+        if not analysis_files:
+            return {"error": "No analysis files found"}
+        
+        # Get the most recent file
+        latest_file = sorted(analysis_files)[-1]
+        
+        with open(latest_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        
+        return {
+            "filename": latest_file,
+            "analysis": data
+        }
+    
+    except Exception as e:
+        return {"error": f"Failed to read analysis: {str(e)}"}

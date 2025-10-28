@@ -1,71 +1,91 @@
 import React, { useState } from 'react';
-import { FileText, Briefcase, CheckCircle, Upload, AlertCircle } from 'lucide-react';
+import { FileText, Briefcase, CheckCircle, XCircle, AlertCircle, Upload } from 'lucide-react';
 
 export default function CVAnalyzer() {
   const [cvText, setCvText] = useState('');
   const [cvFile, setCvFile] = useState(null);
   const [jobDesc, setJobDesc] = useState('');
-  const [testResults, setTestResults] = useState(null);
+  const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     setCvFile(file);
-    setCvText(`File ready: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
-    setError(null);
+    
+    // For now, just store the file
+    // When you connect to FastAPI, you'll send this file directly
+    // Your backend will handle PDF/DOCX extraction
+    
+    // Display filename as placeholder
+    setCvText(`File uploaded: ${file.name}\n\nFile will be processed by backend...`);
   };
 
   const handleAnalyze = async () => {
     setLoading(true);
-    setError(null);
-    setTestResults(null);
   
     const formData = new FormData();
     if (cvFile) {
       formData.append("cv_file", cvFile);
     } else {
-      formData.append("cv_text", cvText);
+    formData.append("cv_text", cvText);
     }
     formData.append("job_description", jobDesc);
 
     try {
-      console.log("Sending request to backend...");
       const response = await fetch("http://127.0.0.1:8000/analyze", {
         method: "POST",
         body: formData,
       });
 
       const data = await response.json();
-      console.log("Response from backend:", data);
-      
-      if (data.error) {
-        setError(data.error);
-      } else {
-        setTestResults(data);
-      }
-    } catch (error) {
+        if (data.gemini_analysis?.error) {
+          alert("Gemini Error: " + data.gemini_analysis.error);
+        }
+        setAnalysis({
+          general: {
+            summary: data.gemini_analysis?.analysis || data.summary || "No analysis received.",
+            overallGrade: 7.5,
+            formattingGrade: 8.0,
+            contentGrade: 6.5,
+          },
+          flags: [],
+          recommendations: [],
+          categories: [],
+        });
+    }   catch (error) {
       console.error("Error analyzing CV:", error);
-      setError(`Network error: ${error.message}. Make sure your backend is running on http://127.0.0.1:8000`);
     }
 
     setLoading(false);
   };
 
+  const getGradeColor = (grade) => {
+    if (grade >= 8) return 'text-green-600';
+    if (grade >= 6) return 'text-yellow-600';
+    return 'text-red-600';
+  };
+
+  const getFlagIcon = (type) => {
+    switch(type) {
+      case 'error': return <XCircle className="w-4 h-4 text-red-500" />;
+      case 'warning': return <AlertCircle className="w-4 h-4 text-yellow-500" />;
+      case 'info': return <CheckCircle className="w-4 h-4 text-blue-500" />;
+      default: return null;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8">
-      <div className="max-w-5xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-6">
-          <h1 className="text-3xl font-bold mb-2 text-gray-800">CV Parser Testing Tool</h1>
-          <p className="text-gray-600 mb-6">Test your backend connection and parser functionality</p>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8">CV NLP Analyzer</h1>
         
-          <div className="grid md:grid-cols-2 gap-6 mb-6">
-            {/* CV Upload Section */}
-            <div className="border-2 border-gray-200 rounded-lg p-6">
+        {!analysis ? (
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-white p-6 rounded border border-gray-200">
               <div className="flex items-center gap-2 mb-4">
-                <FileText className="w-5 h-5 text-blue-600" />
+                <FileText className="w-5 h-5" />
                 <h2 className="text-xl font-semibold">Your CV</h2>
               </div>
               
@@ -74,7 +94,7 @@ export default function CVAnalyzer() {
                   Upload CV (PDF or DOCX)
                 </label>
                 <div className="flex items-center justify-center w-full">
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded cursor-pointer hover:bg-gray-50">
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <Upload className="w-8 h-8 mb-2 text-gray-400" />
                       <p className="mb-2 text-sm text-gray-500">
@@ -91,13 +111,13 @@ export default function CVAnalyzer() {
                   </label>
                 </div>
                 {cvFile && (
-                  <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm text-green-700">
-                    ✓ {cvFile.name} ({(cvFile.size / 1024).toFixed(2)} KB)
+                  <div className="mt-2 text-sm text-green-600">
+                    ✓ {cvFile.name} uploaded
                   </div>
                 )}
               </div>
               
-              <div className="relative my-4">
+              <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
@@ -107,7 +127,7 @@ export default function CVAnalyzer() {
               </div>
               
               <textarea
-                className="w-full h-32 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-40 p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500 mt-4"
                 placeholder="Paste your CV text here..."
                 value={cvFile ? '' : cvText}
                 onChange={(e) => {
@@ -118,126 +138,147 @@ export default function CVAnalyzer() {
               />
             </div>
             
-            {/* Job Description Section */}
-            <div className="border-2 border-gray-200 rounded-lg p-6">
+            <div className="bg-white p-6 rounded border border-gray-200">
               <div className="flex items-center gap-2 mb-4">
-                <Briefcase className="w-5 h-5 text-blue-600" />
+                <Briefcase className="w-5 h-5" />
                 <h2 className="text-xl font-semibold">Job Description</h2>
               </div>
               <textarea
-                className="w-full h-64 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full h-64 p-3 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                 placeholder="Paste the job description here..."
                 value={jobDesc}
                 onChange={(e) => setJobDesc(e.target.value)}
               />
             </div>
           </div>
+        ) : (
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="md:col-span-2 space-y-6">
+              {/* General Analysis */}
+              <div className="bg-white p-6 rounded border border-gray-200">
+                <h2 className="text-2xl font-semibold mb-4">General Analysis</h2>
+                <p className="text-gray-700 mb-4">{analysis.general.summary}</p>
+                
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  <div className="text-center">
+                    <div className={`text-3xl font-bold ${getGradeColor(analysis.general.overallGrade)}`}>
+                      {analysis.general.overallGrade}
+                    </div>
+                    <div className="text-sm text-gray-600">Overall</div>
+                  </div>
+                  <div className="text-center">
+                    <div className={`text-3xl font-bold ${getGradeColor(analysis.general.formattingGrade)}`}>
+                      {analysis.general.formattingGrade}
+                    </div>
+                    <div className="text-sm text-gray-600">Formatting</div>
+                  </div>
+                  <div className="text-center">
+                    <div className={`text-3xl font-bold ${getGradeColor(analysis.general.contentGrade)}`}>
+                      {analysis.general.contentGrade}
+                    </div>
+                    <div className="text-sm text-gray-600">Content</div>
+                  </div>
+                </div>
 
-          {/* Error Display */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
-              <div className="flex items-start gap-2">
-                <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                <div className="space-y-2 mb-6">
+                  <h3 className="font-semibold">Flags</h3>
+                  {analysis.flags.map((flag, idx) => (
+                    <div key={idx} className="flex items-start gap-2 p-2 bg-gray-50 rounded">
+                      {getFlagIcon(flag.type)}
+                      <span className="text-sm">{flag.message}</span>
+                    </div>
+                  ))}
+                </div>
+
                 <div>
-                  <p className="font-semibold">Error:</p>
-                  <p className="text-sm">{error}</p>
+                  <h3 className="font-semibold mb-2">Recommendations</h3>
+                  {analysis.recommendations.map((rec, idx) => (
+                    <div key={idx} className="p-2 mb-2 bg-blue-50 rounded text-sm">
+                      {idx + 1}. {rec}
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-4">
-            <button
-              onClick={handleAnalyze}
-              disabled={loading || (!cvText && !cvFile) || !jobDesc}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors"
-            >
-              {loading ? 'Testing...' : 'Test Parser'}
-            </button>
-            
-            {testResults && (
-              <button
-                onClick={() => {
-                  setTestResults(null);
-                  setCvText('');
-                  setCvFile(null);
-                  setJobDesc('');
-                  setError(null);
-                }}
-                className="px-6 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition-colors"
-              >
-                Reset
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Test Results */}
-        {testResults && (
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <div className="flex items-center gap-2 mb-6">
-              <CheckCircle className="w-6 h-6 text-green-600" />
-              <h2 className="text-2xl font-bold text-gray-800">Test Results</h2>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-4 mb-6">
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <div className="text-3xl font-bold text-blue-600 mb-1">
-                  {testResults.cv_stats?.total_characters || 0}
+              {/* Detailed Categories */}
+              {analysis.categories.map((cat, idx) => (
+                <div key={idx} className="bg-white p-6 rounded border border-gray-200">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-semibold">{cat.name}</h3>
+                    <span className={`text-2xl font-bold ${getGradeColor(cat.score)}`}>
+                      {cat.score}
+                    </span>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-green-700 mb-2">✓ What's Good</h4>
+                    <ul className="list-disc list-inside text-sm text-gray-700">
+                      {cat.good.map((item, i) => <li key={i}>{item}</li>)}
+                    </ul>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-red-700 mb-2">✗ Issues Found</h4>
+                    <ul className="list-disc list-inside text-sm text-gray-700">
+                      {cat.bad.map((item, i) => <li key={i}>{item}</li>)}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-semibold text-blue-700 mb-2">💡 Suggestions</h4>
+                    <ul className="list-disc list-inside text-sm text-gray-700">
+                      {cat.suggestions.map((item, i) => <li key={i}>{item}</li>)}
+                    </ul>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-600">Characters Extracted</div>
-              </div>
-              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                <div className="text-3xl font-bold text-green-600 mb-1">
-                  {testResults.cv_stats?.word_count || 0}
-                </div>
-                <div className="text-sm text-gray-600">Words</div>
-              </div>
-              <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                <div className="text-3xl font-bold text-purple-600 mb-1">
-                  {testResults.cv_stats?.line_count || 0}
-                </div>
-                <div className="text-sm text-gray-600">Lines</div>
-              </div>
+              ))}
             </div>
 
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <h3 className="font-semibold mb-2 text-gray-800">Summary</h3>
-              <p className="text-gray-700">{testResults.summary}</p>
-            </div>
-
-            {testResults.file_info && testResults.file_info.filename && (
-              <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <h3 className="font-semibold mb-3 text-gray-800">File Information</h3>
-                <div className="space-y-2 text-sm">
-                  <div><span className="font-medium">Filename:</span> {testResults.file_info.filename}</div>
-                  <div><span className="font-medium">File Size:</span> {(testResults.file_info.file_size_bytes / 1024).toFixed(2)} KB</div>
-                  <div><span className="font-medium">Extracted Length:</span> {testResults.file_info.extracted_text_length} characters</div>
+            {/* CV Preview Sidebar */}
+            <div className="space-y-6">
+              <div className="bg-white p-4 rounded border border-gray-200 sticky top-8">
+                <h3 className="font-semibold mb-3">Your CV</h3>
+                <div className="text-xs text-gray-600 max-h-96 overflow-y-auto whitespace-pre-wrap bg-gray-50 p-3 rounded">
+                  {cvText || 'No CV text provided'}
                 </div>
               </div>
-            )}
 
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h3 className="font-semibold mb-2 text-gray-800">Text Preview (First 200 characters)</h3>
-              <div className="text-sm text-gray-700 bg-white p-3 rounded border border-gray-200 font-mono whitespace-pre-wrap">
-                {testResults.cv_stats?.preview || 'No preview available'}
-              </div>
-            </div>
-
-            <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-              <div className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-semibold text-green-800">✓ Backend connection working!</p>
-                  <p className="text-sm text-green-700 mt-1">
-                    Your parser successfully extracted text from the CV. Check your terminal for detailed logs.
-                  </p>
-                </div>
+              <div className="bg-blue-50 p-4 rounded border border-blue-200">
+                <h3 className="font-semibold mb-3">Future Updates</h3>
+                <ul className="text-sm text-gray-700 space-y-2">
+                  <li>• Skill Gap Analyzer</li>
+                  <li>• CV History Tracking</li>
+                  <li>• AI Skill Suggestions</li>
+                  <li>• Export Improved CV</li>
+                </ul>
               </div>
             </div>
           </div>
         )}
+
+        <div className="mt-6 flex gap-4">
+          <button
+            onClick={handleAnalyze}
+            disabled={loading || (!cvText && !cvFile) || !jobDesc || analysis}
+            className="px-6 py-3 bg-blue-600 text-white rounded font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed hover:bg-blue-700"
+          >
+            {loading ? 'Analyzing...' : 'Analyze CV'}
+          </button>
+          
+          {analysis && (
+            <button
+              onClick={() => {
+                setAnalysis(null);
+                setCvText('');
+                setCvFile(null);
+                setJobDesc('');
+              }}
+              className="px-6 py-3 bg-gray-600 text-white rounded font-semibold hover:bg-gray-700"
+            >
+              New Analysis
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
