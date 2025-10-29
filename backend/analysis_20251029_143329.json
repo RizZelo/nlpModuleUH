@@ -1,0 +1,103 @@
+{
+  "status": "success",
+  "analysis": {
+    "formatting": {
+      "score": 7,
+      "issues": [
+        "Inconsistent date formatting across sections (e.g., 'Juillet / Août 2025' vs. '2024 - Present')",
+        "Lack of specific dates or date ranges for association memberships.",
+        "Too much whitespace in some sections, making it appear disjointed."
+      ],
+      "suggestions": [
+        "Standardize date formats (e.g., Month Year - Month Year or Year - Year).",
+        "Include specific start and end dates (if applicable) for each role in associations.",
+        "Reduce excessive whitespace for a more compact and professional look. Consider using a template."
+      ]
+    },
+    "content": {
+      "score": 6,
+      "strengths": [
+        "Demonstrates a broad range of technical skills.",
+        "Includes diverse project experience, both educational and humanitarian.",
+        "Shows active involvement in extracurricular activities and certifications."
+      ],
+      "weaknesses": [
+        "Lacks specific examples and quantifiable results for projects and experiences relevant to server-side development.",
+        "Doesn't explicitly highlight server-side development skills matching the job description (Node.js, Django, Spring Boot, RESTful APIs, GraphQL, database management).",
+        "The descriptions of projects are too generic, lacking details of server-side contributions and technologies used."
+      ],
+      "suggestions": [
+        "Quantify achievements in projects (e.g., 'Reduced database query time by X%').",
+        "Highlight experiences and projects specifically showcasing server-side development skills mentioned in the job description.",
+        "Provide more details about the technologies used and the specific role in each project. Tailor project descriptions towards server-side responsibilities like API design, database schema optimization, or backend logic implementation."
+      ]
+    },
+    "general": {
+      "overall_score": 6,
+      "summary": "The CV demonstrates a good foundation of technical skills and project experience. However, it needs to be tailored to the specific requirements of the server-side development job description by showcasing relevant skills, projects, and quantifiable achievements. Increasing focus on server-side technologies and improving the clarity and impact of project descriptions will significantly strengthen the application.",
+      "top_priorities": [
+        "Tailor the CV content to highlight server-side development skills (Node.js, Django, REST APIs, databases).",
+        "Provide quantifiable results and specific details for projects and experiences.",
+        "Improve the clarity and impact of project descriptions by detailing technologies used and server-side contributions."
+      ]
+    },
+    "inline_suggestions": [
+      {
+        "text_snippet": "Système de gestion des transports publics : Conception d’une base de données MySQL pour gérer véhicules, utilisateurs et billets, avec interface graphique pour faciliter l’utilisation.",
+        "issue_type": "impact",
+        "problem": "Lacks detail on server-side implementation. No mention of API, backend technologies, or database optimization.",
+        "suggestion": "Système de gestion des transports publics : Developed a RESTful API using [Backend framework like Node.js/Express or Django/Python] to manage vehicles, users, and tickets, backed by a MySQL database with optimized schema for performance. Implemented user authentication and authorization.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Stage d’été en 5G - Orange Tunisie & IEEE Technical Activities Tunisia Section - Juillet / Août 2025",
+        "issue_type": "relevance",
+        "problem": "While relevant to telecommunications, it's not directly relevant to server-side development.",
+        "suggestion": "Briefly mention the stage and highlight any server-side or API-related aspects if applicable. Otherwise, prioritize projects with server-side elements.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Programmation : Python, C/C++, POO, MATLAB, Langage Assembleur, VHDL.",
+        "issue_type": "keyword",
+        "problem": "Lists programming languages, but doesn't highlight the relevant frameworks (e.g., Django for Python).",
+        "suggestion": "Programming: Python (Django, Flask), C/C++, MATLAB, VHDL.",
+        "replacement": "Programming: Python (Django, Flask), C/C++, MATLAB, VHDL."
+      },
+      {
+        "text_snippet": "Développement web et mobiles : HTML, CSS, JavaScript, PHP.",
+        "issue_type": "keyword",
+        "problem": "Too generic. Needs to show server-side web development skills.",
+        "suggestion": "Web Development: HTML, CSS, JavaScript, PHP, RESTful APIs.",
+        "replacement": "Web Development: HTML, CSS, JavaScript, PHP, RESTful APIs."
+      },
+      {
+        "text_snippet": "Ecole Supérieure de Communication de Tunis ( SUP’COM ).",
+        "issue_type": "clarity",
+        "problem": "Doesn't specify the degree or major.",
+        "suggestion": "Ecole Supérieure de Communication de Tunis (SUP’COM), Engineering Degree in Telecommunications.",
+        "replacement": "Ecole Supérieure de Communication de Tunis (SUP’COM), Engineering Degree in Telecommunications."
+      },
+      {
+        "text_snippet": "Système d’authentification en C++ : Création d’un programme console permettant l’inscription et la connexion des utilisateurs, avec gestion des mots de passe et des fichiers.",
+        "issue_type": "impact",
+        "problem": "While showcasing programming ability, lacks details on security aspects relevant to server-side development.",
+        "suggestion": "Système d’authentification en C++: Developed a console application for user registration and login, incorporating secure password hashing and storage using [mention library or algorithm used e.g., bcrypt].",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Mise en place et validation d’un banc d’essai 5G SA (Standalone) avec intégration SIM et gNB.",
+        "issue_type": "relevance",
+        "problem": "Not directly related to server-side development. Focus should be on highlighting relevant skills.",
+        "suggestion": "Briefly mentioned the technical aspects of this experience, and prioritize relevant experiences for the application.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Préparation de cas d’usage et démonstrations pour un hackathon 5G.",
+        "issue_type": "relevance",
+        "problem": "Not directly related to server-side development, unless it involved server-side technologies.",
+        "suggestion": "If the use cases or demonstrations involved server-side aspects, specify what technologies and role played.",
+        "replacement": null
+      }
+    ]
+  }
+}
