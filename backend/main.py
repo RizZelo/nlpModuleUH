@@ -83,7 +83,7 @@ async def analyze(
             
             if 'error' in parse_result:
                 print(f"❌ Parser error: {parse_result['error']}")
-                return {"error": f"Failed to parse document: {parse_result['error']}"}
+                return {"error": "Failed to parse document. Please ensure the file is valid and try again."}
             
             text = parse_result.get('plain_text')
             html_content = parse_result.get('html')
@@ -110,7 +110,7 @@ async def analyze(
             print(f"❌ Error processing file: {str(e)}")
             import traceback
             traceback.print_exc()
-            return {"error": f"Failed to process file: {str(e)}"}
+            return {"error": "Failed to process file. Please ensure the file is valid and try again."}
     
     elif cv_text:
         print(f"📝 Raw text provided: {len(cv_text)} characters")
@@ -156,7 +156,7 @@ async def analyze(
         
     except Exception as e:
         print(f"❌ Error saving JSON: {str(e)}")
-        return {"error": f"Failed to save JSON: {str(e)}"}
+        return {"error": "Failed to save analysis data. Please try again."}
     
     # Analyze with Gemini if requested
     gemini_analysis = None
@@ -234,7 +234,8 @@ async def get_latest_cv():
         }
     
     except Exception as e:
-        return {"error": f"Failed to read CV data: {str(e)}"}
+        print(f"❌ Error reading CV data: {str(e)}")
+        return {"error": "Failed to read CV data. Please try again."}
 
 
 @app.get("/latest-analysis")
@@ -259,4 +260,5 @@ async def get_latest_analysis():
         }
     
     except Exception as e:
-        return {"error": f"Failed to read analysis: {str(e)}"}
+        print(f"❌ Error reading analysis: {str(e)}")
+        return {"error": "Failed to read analysis. Please try again."}
