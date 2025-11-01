@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Environment variables
+.env
+*.env
+
+# Temporary files
+cv_data_*.json
+analysis_*.json
+
+# Node modules
+node_modules/
+npm-debug.log*
+
+# Build outputs
+backend/dist/
+frontend/build/
+frontend/dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

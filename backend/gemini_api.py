@@ -10,14 +10,23 @@ def analyze_cv_with_gemini(cv_text: str, job_description: str, api_key: str):
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-2.0-flash-exp")
 
+    # Build prompt based on whether job description is provided
+    job_context = f"""
+Job Description:
+{job_description}
+
+Analyze this CV against the job description and provide detailed feedback on job relevance and keyword matching.
+""" if job_description and job_description.strip() else """
+No specific job description provided. Analyze the CV for general quality, formatting, and best practices.
+"""
+
     prompt = f"""
-Analyze this CV against the job description and provide detailed feedback.
+Analyze this CV and provide detailed feedback.
 
 CV:
 {cv_text}
 
-Job Description:
-{job_description}
+{job_context}
 
 Return your response as **valid JSON** with this EXACT structure (no markdown):
 
@@ -36,23 +45,60 @@ Return your response as **valid JSON** with this EXACT structure (no markdown):
     "general": {{
         "overall_score": <number 0-10>,
         "summary": "brief overall assessment in 2-3 sentences",
-        "top_priorities": ["priority1", "priority2", "priority3"]
+        "top_priorities": [
+            {{
+                "priority": 1,
+                "action": "specific action to take",
+                "impact": "High|Medium|Low",
+                "time_estimate": "5 mins|15 mins|30 mins|1 hour",
+                "category": "Formatting|Content|Keywords|ATS"
+            }}
+        ]
     }},
+    "sections": [
+        {{
+            "name": "Experience|Education|Skills|etc",
+            "quality_score": <number 0-10>,
+            "feedback": "specific feedback for this section",
+            "suggestions": ["suggestion1", "suggestion2"]
+        }}
+    ],
     "inline_suggestions": [
         {{
             "text_snippet": "exact text from CV that needs improvement",
             "issue_type": "grammar|clarity|impact|keyword|formatting",
+            "severity": "critical|high|medium|low",
+            "section": "which section this belongs to",
             "problem": "what's wrong with this text",
             "suggestion": "specific improvement suggestion",
-            "replacement": "suggested replacement text (if applicable)"
+            "replacement": "suggested replacement text (if applicable)",
+            "explanation": "why this change matters"
         }}
-    ]
+    ],
+    "quick_wins": [
+        {{
+            "change": "what to change",
+            "where": "which section or part",
+            "effort": "5 mins|15 mins",
+            "impact": "High|Medium"
+        }}
+    ],
+    "ats_analysis": {{
+        "relevance_score": <number 0-100>,
+        "keyword_matches": ["keyword1", "keyword2"],
+        "missing_keywords": ["keyword1", "keyword2"],
+        "recommendations": ["recommendation1", "recommendation2"]
+    }}
 }}
 
 Guidelines:
-- Identify 5–10 high-impact inline suggestions using exact text snippets.
+- Identify 5–10 high-impact inline suggestions using exact text snippets from the CV.
 - Evaluate formatting, content, clarity, and job relevance.
+- For top_priorities, provide 3-5 actionable items with all required fields.
+- For sections, analyze major CV sections (Experience, Education, Skills, Summary, etc).
+- For quick_wins, focus on easy, high-impact changes.
 - Be concrete, helpful, and specific.
+- If no job description provided, focus on general CV best practices and ATS compatibility.
 """
 
     try:
@@ -66,21 +112,28 @@ Guidelines:
 
         parsed = json.loads(response_text)
 
-        # Convert Gemini structure → your original structure
+        # Convert Gemini structure → frontend-compatible structure
+        ats_analysis = parsed.get("ats_analysis", {})
+        
         analysis_result = {
             'status': 'success',
             'analysis': {
                 'overall_score': int(parsed["general"]["overall_score"] * 10),  # scale 0–100
-                'ats_score': int((parsed["content"]["score"] + parsed["formatting"]["score"]) * 5),
+                'ats_score': ats_analysis.get("relevance_score", int((parsed["content"]["score"] + parsed["formatting"]["score"]) * 5)),
                 'readability_score': 80 + (parsed["formatting"]["score"] - 5) * 4,
                 'summary': parsed["general"]["summary"],
                 'critical_issues': parsed["formatting"]["issues"] + parsed["content"]["weaknesses"],
                 'inline_suggestions': parsed.get("inline_suggestions", []),
-                'section_analysis': parsed["content"]["strengths"],
-                'quick_wins': parsed["content"]["suggestions"][:3],
+                'section_analysis': parsed.get("sections", []),
+                'quick_wins': parsed.get("quick_wins", []),
                 'top_priorities': parsed["general"]["top_priorities"],
                 'grammar_and_clarity': {"issues": parsed["formatting"]["issues"]},
-                'job_match_analysis': {"relevance_score": parsed["content"]["score"] * 10},
+                'job_match_analysis': {
+                    "relevance_score": ats_analysis.get("relevance_score", parsed["content"]["score"] * 10),
+                    "keyword_matches": ats_analysis.get("keyword_matches", []),
+                    "missing_keywords": ats_analysis.get("missing_keywords", []),
+                    "recommendations": ats_analysis.get("recommendations", [])
+                },
                 'global_analysis': {
                     "formatting_score": parsed["formatting"]["score"],
                     "content_score": parsed["content"]["score"]

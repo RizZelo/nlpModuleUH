@@ -27,8 +27,8 @@ export default function EnhancedCVAnalyzer() {
   };
 
   const handleAnalyze = async () => {
-    if (!cvFile || !jobDesc) {
-      alert('Please upload a CV and provide job description');
+    if (!cvFile) {
+      alert('Please upload a CV');
       return;
     }
 
@@ -217,19 +217,19 @@ export default function EnhancedCVAnalyzer() {
             <div className="bg-white rounded-xl shadow-lg p-8 border-2 border-gray-200">
               <div className="flex items-center gap-3 mb-6">
                 <Briefcase className="w-6 h-6 text-blue-600" />
-                <h2 className="text-2xl font-semibold">Target Job</h2>
+                <h2 className="text-2xl font-semibold">Target Job <span className="text-sm text-gray-500 font-normal">(Optional)</span></h2>
               </div>
               
               <textarea
                 className="w-full h-56 p-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                placeholder="Paste the full job description here...&#10;&#10;Include: requirements, responsibilities, desired skills, and qualifications."
+                placeholder="Paste the full job description here (optional)...&#10;&#10;Leave empty to analyze your CV for general best practices and ATS compatibility.&#10;&#10;Or include: requirements, responsibilities, desired skills, and qualifications for job-specific analysis."
                 value={jobDesc}
                 onChange={(e) => setJobDesc(e.target.value)}
               />
               
-              <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-sm text-yellow-800">
-                  <strong>Tip:</strong> More detailed job descriptions lead to better keyword matching and relevance analysis.
+              <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> Job description is optional. Without it, we'll analyze your CV for general quality, formatting, and ATS compatibility.
                 </p>
               </div>
             </div>
@@ -238,7 +238,7 @@ export default function EnhancedCVAnalyzer() {
           <div className="mt-8 text-center">
             <button
               onClick={handleAnalyze}
-              disabled={loading || !cvFile || !jobDesc}
+              disabled={loading || !cvFile}
               className="px-12 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-lg disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed hover:from-blue-700 hover:to-indigo-700 transition shadow-lg disabled:shadow-none transform hover:scale-105 disabled:transform-none"
             >
               {loading ? (
@@ -254,11 +254,13 @@ export default function EnhancedCVAnalyzer() {
               )}
             </button>
             
-            {!cvFile || !jobDesc ? (
+            {!cvFile ? (
               <p className="mt-4 text-sm text-gray-500">
-                {!cvFile && !jobDesc && 'Please upload your CV and provide a job description'}
-                {cvFile && !jobDesc && 'Please provide a job description to continue'}
-                {!cvFile && jobDesc && 'Please upload your CV to continue'}
+                Please upload your CV to continue
+              </p>
+            ) : !jobDesc ? (
+              <p className="mt-4 text-sm text-gray-400 italic">
+                Job description is optional - you can analyze your CV for general best practices
               </p>
             ) : null}
           </div>
@@ -569,6 +571,144 @@ export default function EnhancedCVAnalyzer() {
                     </div>
                   </div>
                 ))}
+                
+                {quickWins.length === 0 && (
+                  <div className="text-center py-12 text-gray-500">
+                    <Zap className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                    <p>No quick wins available</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'sections' && (
+              <div className="space-y-4">
+                {sectionAnalysis.map((section, idx) => (
+                  <div key={idx} className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h3 className="font-bold text-lg text-gray-900">{section.name}</h3>
+                        {section.quality_score !== undefined && (
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="text-sm text-gray-600">Quality Score:</div>
+                            <div className={`text-lg font-bold ${getScoreColor(section.quality_score * 10)}`}>
+                              {section.quality_score}/10
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {section.feedback && (
+                      <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded">
+                        <p className="text-sm text-gray-700">{section.feedback}</p>
+                      </div>
+                    )}
+                    
+                    {section.suggestions && section.suggestions.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold text-sm text-gray-700 mb-2">Suggestions:</h4>
+                        <ul className="space-y-1">
+                          {section.suggestions.map((suggestion, sidx) => (
+                            <li key={sidx} className="flex items-start gap-2 text-sm text-gray-700">
+                              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                              <span>{suggestion}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                
+                {sectionAnalysis.length === 0 && (
+                  <div className="text-center py-12 text-gray-500">
+                    <FileText className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                    <p>No section analysis available</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'ats' && (
+              <div className="space-y-6">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                  <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <TrendingUp className="w-6 h-6 text-blue-600" />
+                    ATS Compatibility Score
+                  </h2>
+                  
+                  <div className="flex items-center justify-center mb-6">
+                    <div className={`text-6xl font-bold ${getScoreColor(jobMatch.relevance_score || 0)}`}>
+                      {jobMatch.relevance_score || 0}
+                    </div>
+                    <div className="text-2xl text-gray-500 ml-2">/100</div>
+                  </div>
+                  
+                  <div className="w-full bg-gray-200 rounded-full h-4 mb-6">
+                    <div
+                      className={`h-4 rounded-full transition-all ${
+                        (jobMatch.relevance_score || 0) >= 80 ? 'bg-green-500' :
+                        (jobMatch.relevance_score || 0) >= 60 ? 'bg-yellow-500' :
+                        (jobMatch.relevance_score || 0) >= 40 ? 'bg-orange-500' : 'bg-red-500'
+                      }`}
+                      style={{ width: `${jobMatch.relevance_score || 0}%` }}
+                    />
+                  </div>
+                  
+                  <p className="text-sm text-gray-600 text-center">
+                    {(jobMatch.relevance_score || 0) >= 80 ? 'Excellent! Your CV is well-optimized for ATS systems.' :
+                     (jobMatch.relevance_score || 0) >= 60 ? 'Good. Some improvements can increase your ATS score.' :
+                     (jobMatch.relevance_score || 0) >= 40 ? 'Fair. Consider addressing the recommendations below.' :
+                     'Needs improvement. Follow the recommendations to optimize for ATS.'}
+                  </p>
+                </div>
+                
+                {jobMatch.keyword_matches && jobMatch.keyword_matches.length > 0 && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-5">
+                    <h3 className="font-bold text-green-900 mb-3 flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5" />
+                      Matching Keywords ({jobMatch.keyword_matches.length})
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {jobMatch.keyword_matches.map((keyword, idx) => (
+                        <span key={idx} className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                          {keyword}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {jobMatch.missing_keywords && jobMatch.missing_keywords.length > 0 && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-5">
+                    <h3 className="font-bold text-red-900 mb-3 flex items-center gap-2">
+                      <XCircle className="w-5 h-5" />
+                      Missing Keywords ({jobMatch.missing_keywords.length})
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {jobMatch.missing_keywords.map((keyword, idx) => (
+                        <span key={idx} className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                          {keyword}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {jobMatch.recommendations && jobMatch.recommendations.length > 0 && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
+                    <h3 className="font-bold text-blue-900 mb-3">Recommendations</h3>
+                    <ul className="space-y-2">
+                      {jobMatch.recommendations.map((rec, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-blue-800">
+                          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                          <span>{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
           </div>

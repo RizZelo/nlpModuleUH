@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from parser import parse_document  # your parser.py file
+from parser import parse_document, CVParser  # your parser.py file
 from gemini_api import analyze_cv_with_gemini  # Gemini integration
 from google import generativeai as genai
 import tempfile
@@ -38,7 +38,7 @@ app.add_middleware(
 async def analyze(
     cv_file: UploadFile = File(None),
     cv_text: str = Form(None),
-    job_description: str = Form(...),
+    job_description: str = Form(""),
     use_gemini: bool = Form(True)  # Toggle Gemini analysis
 ):
     """
@@ -51,6 +51,9 @@ async def analyze(
 
     # If a file was uploaded, save it temporarily and parse it
     text = cv_text
+    html_content = None
+    structured_data = None
+    metadata = None
     file_info = {}
     
     if cv_file:
@@ -70,12 +73,22 @@ async def analyze(
             print(f"💾 Saved to temp file: {tmp_path}")
             print(f"📏 File size: {len(content)} bytes")
             
-            # Parse the document
+            # Parse the document with CVParser to get HTML and structured data
             print("🔄 Parsing document...")
-            text = parse_document(tmp_path)
+            parser = CVParser()
+            parse_result = parser.parse_document(tmp_path)
             
             # Clean up temp file
             os.unlink(tmp_path)
+            
+            if 'error' in parse_result:
+                print(f"❌ Parser error: {parse_result['error']}")
+                return {"error": f"Failed to parse document: {parse_result['error']}"}
+            
+            text = parse_result.get('plain_text')
+            html_content = parse_result.get('html')
+            structured_data = parse_result.get('structured')
+            metadata = parse_result.get('metadata')
             
             if text:
                 print(f"✅ Successfully extracted text")
@@ -85,10 +98,12 @@ async def analyze(
                 file_info = {
                     "filename": cv_file.filename,
                     "file_size_bytes": len(content),
-                    "extracted_text_length": len(text)
+                    "extracted_text_length": len(text),
+                    "has_html": html_content is not None,
+                    "parser": metadata.get('parser') if metadata else 'unknown'
                 }
             else:
-                print("❌ Parser returned None")
+                print("❌ Parser returned no text")
                 return {"error": "Failed to extract text from file"}
                 
         except Exception as e:
@@ -170,7 +185,10 @@ async def analyze(
             "word_count": word_count,
             "line_count": line_count,
             "preview": text[:500] + "..." if len(text) > 500 else text,
-            "full_text": text  # ✅ ADD THIS - full extracted text
+            "full_text": text,
+            "html": html_content,
+            "structured": structured_data,
+            "metadata": metadata
         },
         "job_description_length": len(job_description),
         "file_info": file_info if cv_file else {"source": "raw_text"}
