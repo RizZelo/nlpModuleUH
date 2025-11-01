@@ -1,6 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FileText, Briefcase, CheckCircle, XCircle, AlertCircle, Upload, Download, Edit3, Lightbulb, X, Sparkles, TrendingUp, Target, Zap, Clock, AlertTriangle, Check, Eye, EyeOff } from 'lucide-react';
 
+// Reusable EmptyState component
+const EmptyState = ({ icon: Icon, message }) => (
+  <div className="text-center py-12 text-gray-500">
+    <Icon className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+    <p>{message}</p>
+  </div>
+);
+
 export default function EnhancedCVAnalyzer() {
   const [cvFile, setCvFile] = useState(null);
   const [jobDesc, setJobDesc] = useState('');
@@ -538,10 +546,7 @@ export default function EnhancedCVAnalyzer() {
                 ))}
                 
                 {inlineSuggestions.length === 0 && (
-                  <div className="text-center py-12 text-gray-500">
-                    <Lightbulb className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                    <p>No suggestions available</p>
-                  </div>
+                  <EmptyState icon={Lightbulb} message="No suggestions available" />
                 )}
               </div>
             )}
@@ -573,10 +578,7 @@ export default function EnhancedCVAnalyzer() {
                 ))}
                 
                 {quickWins.length === 0 && (
-                  <div className="text-center py-12 text-gray-500">
-                    <Zap className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                    <p>No quick wins available</p>
-                  </div>
+                  <EmptyState icon={Zap} message="No quick wins available" />
                 )}
               </div>
             )}
@@ -622,10 +624,7 @@ export default function EnhancedCVAnalyzer() {
                 ))}
                 
                 {sectionAnalysis.length === 0 && (
-                  <div className="text-center py-12 text-gray-500">
-                    <FileText className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                    <p>No section analysis available</p>
-                  </div>
+                  <EmptyState icon={FileText} message="No section analysis available" />
                 )}
               </div>
             )}
