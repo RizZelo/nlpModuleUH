@@ -4,13 +4,13 @@ import re
 
 def analyze_cv_with_gemini(cv_text: str, job_description: str, api_key: str):
     """
-    Analyze CV with Gemini and return structured feedback with inline suggestions
+    Analyze CV with Gemini and return structured feedback in your existing structure
+    while keeping Gemini’s rich inline suggestions and detailed insights.
     """
-    try:
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-2.0-flash-exp")
-        
-        prompt = f"""
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel("gemini-2.0-flash-exp")
+
+    prompt = f"""
 Analyze this CV against the job description and provide detailed feedback.
 
 CV:
@@ -19,7 +19,8 @@ CV:
 Job Description:
 {job_description}
 
-Return your response as valid JSON with this EXACT structure (no markdown, just pure JSON):
+Return your response as **valid JSON** with this EXACT structure (no markdown):
+
 {{
     "formatting": {{
         "score": <number 0-10>,
@@ -48,52 +49,59 @@ Return your response as valid JSON with this EXACT structure (no markdown, just 
     ]
 }}
 
-For inline_suggestions:
-- Identify 5-10 specific phrases or sentences from the CV that need improvement
-- Use exact text snippets (10-50 words) that appear in the CV
-- Provide actionable replacements when possible
-- Focus on high-impact improvements
-
-Focus on:
-- Formatting: layout, structure, consistency, white space
-- Content: relevance to job, achievements, keywords, impact, clarity
-- Grammar and clarity issues
-- Missing or weak action verbs
-- Lack of quantifiable achievements
-
-Be specific, actionable, and honest in your assessment.
+Guidelines:
+- Identify 5–10 high-impact inline suggestions using exact text snippets.
+- Evaluate formatting, content, clarity, and job relevance.
+- Be concrete, helpful, and specific.
 """
-        
+
+    try:
         response = model.generate_content(prompt)
         response_text = response.text.strip()
-        
-        # Remove markdown code blocks if present
+
+        # Remove any markdown code blocks
         json_match = re.search(r'```(?:json)?\s*(.*?)\s*```', response_text, re.DOTALL)
         if json_match:
             response_text = json_match.group(1).strip()
-        
-        # Parse JSON
-        result = json.loads(response_text)
-        
-        # Validate inline_suggestions structure
-        if "inline_suggestions" not in result:
-            result["inline_suggestions"] = []
-        
-        return {
-            "status": "success",
-            "analysis": result
+
+        parsed = json.loads(response_text)
+
+        # Convert Gemini structure → your original structure
+        analysis_result = {
+            'status': 'success',
+            'analysis': {
+                'overall_score': int(parsed["general"]["overall_score"] * 10),  # scale 0–100
+                'ats_score': int((parsed["content"]["score"] + parsed["formatting"]["score"]) * 5),
+                'readability_score': 80 + (parsed["formatting"]["score"] - 5) * 4,
+                'summary': parsed["general"]["summary"],
+                'critical_issues': parsed["formatting"]["issues"] + parsed["content"]["weaknesses"],
+                'inline_suggestions': parsed.get("inline_suggestions", []),
+                'section_analysis': parsed["content"]["strengths"],
+                'quick_wins': parsed["content"]["suggestions"][:3],
+                'top_priorities': parsed["general"]["top_priorities"],
+                'grammar_and_clarity': {"issues": parsed["formatting"]["issues"]},
+                'job_match_analysis': {"relevance_score": parsed["content"]["score"] * 10},
+                'global_analysis': {
+                    "formatting_score": parsed["formatting"]["score"],
+                    "content_score": parsed["content"]["score"]
+                }
+            }
         }
-        
+
+        return analysis_result
+
     except json.JSONDecodeError as e:
-        print(f"❌ JSON parsing error: {str(e)}")
-        print(f"Raw response: {response_text[:500]}")
+        print("❌ JSON parsing error:", str(e))
+        print("Raw response:", response_text[:300])
         return {
-            "error": "Failed to parse Gemini response as JSON",
-            "raw_response": response_text[:500]
+            "status": "error",
+            "message": "Failed to parse Gemini response",
+            "raw_output": response_text[:300]
         }
-    
+
     except Exception as e:
-        print(f"❌ Gemini API error: {str(e)}")
+        print("❌ Gemini API error:", str(e))
         return {
-            "error": f"Gemini API error: {str(e)}"
+            "status": "error",
+            "message": f"Gemini API error: {str(e)}"
         }

@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-10-31T16:03:28.186759",
+  "filename": "CV Mohamed Ali.pdf",
+  "job_description": "AI engineer\r\n",
+  "cv_data": {
+    "html": "<div>Parsed HTML content would go here</div>",
+    "plain_text": "Extracted plain text",
+    "metadata": {
+      "format": ".pdf",
+      "file_size_bytes": 440527,
+      "word_count": 450,
+      "parser": "placeholder"
+    },
+    "structured": {
+      "sections": [],
+      "contacts": {},
+      "dates": [],
+      "skills": [],
+      "bullet_points": []
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-10-31T16:48:58.122228",
+  "cv_text": "Edam Taktek\nBackend Developer | Python & Java | Flask • Spring Boot • PoﬆgreSQL\n+216 29858535\nedam.taktek65@gmail.com\nSfax, Route Saltania\ngithub.com/Adeeem2\nwww.linkedin.com/in/edam-taktek-\n5b9b27338/\nfacebook.com/edam.AdouWe\nSummary\nResourceful Developer with hands-\non experience in backend\ndevelopment and data automation.\nSkilled in Python, Flask, Java, and\nweb scraping. Currently working on\nreal-world projects involving\nDocker, PoﬆgreSQL, and APIs.\nEducation\nEngineering Degree in Data\nScience – 1ﬆ Year\nNational School of Electronics and\nTelecommunications of Sfax\n(ENET'Com)\nsept., 2024 - Present\nBaccalaureate in Mathematics\nLycée Med Ali Sfax\nsept., 2018 - juin, 2022\nTechnical Skills\nJavaScript, Python, Web Services, C,\nHTML5, CSS, SQL, User Interface,\nAssembly, Docker, Linux, Git\nSoft Skills\nCollaboration, Problem-solving,\nCommunication, Time management,\nAdditional Skills\nAdobe After Effects, Adobe Photoshop,\nBasic penetration teﬆing\nLanguages\nEnglish, Frensh, Arabic\nCertiﬁcations\nMicrosoft Certiﬁed: Azure AI\nFundamentals\nWork Experience\nFreelance Python Developer\nmars, 2025 - Present\nBackend Developer\nDeveloped web scraping scripts using BeautifulSoup, Playwright and\nCelery to extract and process ﬆructured data from various websites\nBuilt and deployed a Flask web app to track subreddit activity using the\nReddit API, PoﬆgreSQL, and Docker\nWorked with clients to automate repetitive tasks, improve data collection\nefﬁciency, and deliver clean, usable datasets\nSonotrak\naoût, 2024 - sept., 2024\nTicketing Agent\nSonotrak is the main transportation company operating ferry services be-\ntween Sfax and the Kerkennah Island.\nManaged daily ticket sales and cuﬆomer service at the ferry terminal\nbetween Sfax and Kerkennah\nIdentiﬁed software limitations in the company’s outdated ticketing syﬆem\n(from 2006), including lack of refund options\nProposed a digital transformation plan involving modern software\nsolutions to improve ticketing ﬂexibility and user experience\nProjects\nSubreddit Activity Tracker\nA web app that tracks and ﬆores activity from speciﬁed subreddits using\nReddit’s API, with background tasks via Celery.\nDesigned and built a Flask web application to monitor poﬆ frequency and\nuser activity across selected subreddits in real time\nIntegrated Reddit API with PoﬆgreSQL for ﬆructured data ﬆorage and\nquerying\nDeployed background tasks using Celery and Docker to automate\nperiodic data collection\nFounder – Cuﬆom T-Shirt Brand ( Tuno )\njuin, 2023 - sept., 2024\nhttps://www.inﬆagram.com/tun00x\nCreated and launched a small clothing brand focused on personalized t-\nshirt designs\nManaged the entire process from concept, design (using Photoshop), and\nsourcing, to cuﬆomer delivery\n",
+  "job_description": "AI engineer\r\n",
+  "statistics": {
+    "total_characters": 2715,
+    "word_count": 374,
+    "line_count": 81
+  },
+  "file_info": {
+    "filename": "ATSresume.pdf",
+    "file_size_bytes": 288040,
+    "extracted_text_length": 2715
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "status": "success",
+  "analysis": {
+    "overall_score": 50,
+    "ats_score": 60,
+    "readability_score": 88,
+    "summary": "The CV demonstrates backend development skills but lacks explicit experience in core AI areas. To be competitive for an AI Engineer role, the candidate needs to highlight relevant AI-related skills, projects, and education.",
+    "critical_issues": [
+      "Inconsistent use of bolding and capitalization.",
+      "Typos throughout the document (e.g., 'PoﬆgreSQL', 'Frensh', multiple instances of character encoding issues).",
+      "Lack of visual hierarchy in some sections.",
+      "Limited direct relevance to an AI Engineer role. The CV focuses heavily on backend web development.",
+      "Lack of experience in core AI areas like machine learning, deep learning, or natural language processing.",
+      "Education section indicates only 1st year of Data Science degree; this needs clarification if relevant skills have been acquired.",
+      "Weak summary statement, doesn't effectively highlight AI related skills."
+    ],
+    "inline_suggestions": [
+      {
+        "text_snippet": "Resourceful Developer with hands- on experience in backend development and data automation.",
+        "issue_type": "impact",
+        "problem": "The summary is generic and doesn't mention AI specifically.",
+        "suggestion": "Rewrite to highlight AI related projects and skills, e.g., 'Developer with experience in backend development and data automation, seeking to apply skills in machine learning and data analysis to build innovative AI solutions.'",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Flask • Spring Boot • PoﬆgreSQL",
+        "issue_type": "formatting",
+        "problem": "Character encoding issue with PoﬆgreSQL.",
+        "suggestion": "Fix the character encoding error.",
+        "replacement": "Flask • Spring Boot • PostgreSQL"
+      },
+      {
+        "text_snippet": "Currently working on real-world projects involving Docker, PoﬆgreSQL, and APIs.",
+        "issue_type": "impact",
+        "problem": "Too vague; specify the nature of these projects and their AI relevance (if any).",
+        "suggestion": "Currently working on projects involving data pipelines with Docker and PostgreSQL, and integrating APIs for [Specific AI use case, e.g., sentiment analysis].",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Engineering Degree in Data Science – 1ﬆ Year",
+        "issue_type": "clarity",
+        "problem": "The fact that it's only the first year raises concerns. How much AI-specific knowledge has been gained?",
+        "suggestion": "Expand on relevant coursework or projects completed during the first year that relate to AI. If little relevance, consider omitting.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Frensh",
+        "issue_type": "grammar",
+        "problem": "Typo.",
+        "suggestion": "Correct the spelling.",
+        "replacement": "French"
+      },
+      {
+        "text_snippet": "Backend Developer\nDeveloped web scraping scripts using BeautifulSoup, Playwright and\nCelery to extract and process ﬆructured data from various websites",
+        "issue_type": "impact",
+        "problem": "While useful, this description needs to tie into AI if possible.  How was the scraped data used for data analysis or machine learning?",
+        "suggestion": "Backend Developer\nDeveloped web scraping scripts using BeautifulSoup, Playwright, and Celery to extract and process structured data from various websites for [Specific Data Analysis/Machine Learning Task].",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Proposed a digital transformation plan involving modern software\nsolutions to improve ticketing ﬂexibility and user experience",
+        "issue_type": "impact",
+        "problem": "Irrelevant to AI role.  Consider removing or shortening.",
+        "suggestion": "Briefly mention the proposal but focus on more relevant experiences.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Subreddit Activity Tracker",
+        "issue_type": "impact",
+        "problem": "Needs to highlight if this involved any data analysis or ML tasks.",
+        "suggestion": "Subreddit Activity Tracker - Utilized Natural Language Processing to analyze sentiment and trends in subreddit activity.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Designed and built a Flask web application to monitor poﬆ frequency and user activity across selected subreddits in real time",
+        "issue_type": "impact",
+        "problem": "Missing specifics regarding data analysis or AI usage.",
+        "suggestion": "Designed and built a Flask web application to monitor post frequency and user activity across selected subreddits in real-time, incorporating sentiment analysis using [Specific NLP Library] to understand user opinions.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Basic penetration teﬆing",
+        "issue_type": "impact",
+        "problem": "Not relevant to AI role; consider removing if space is limited.",
+        "suggestion": "Remove if prioritizing space for AI-related skills.",
+        "replacement": null
+      }
+    ],
+    "section_analysis": [
+      "Demonstrated proficiency in Python, Flask, and PostgreSQL.",
+      "Experience with web scraping and API integration.",
+      "Personal projects showcase practical application of skills."
+    ],
+    "quick_wins": [
+      "Tailor the CV to highlight any AI-related skills or experiences, even if they are personal projects. Explicitly mention AI, ML, or data science keywords relevant to the job description.",
+      "If the Data Science degree has equipped you with any AI-related skills, explicitly list them and provide context.",
+      "Expand on any projects where you utilized data analysis, statistical modeling, or machine learning techniques."
+    ],
+    "top_priorities": [
+      "Tailor the CV to the specific AI Engineer job description, emphasizing relevant skills and experiences.",
+      "Address the lack of AI-specific experience by highlighting relevant coursework, personal projects, or contributions to open-source AI projects.",
+      "Proofread the CV carefully to eliminate typos and formatting inconsistencies."
+    ],
+    "grammar_and_clarity": {
+      "issues": [
+        "Inconsistent use of bolding and capitalization.",
+        "Typos throughout the document (e.g., 'PoﬆgreSQL', 'Frensh', multiple instances of character encoding issues).",
+        "Lack of visual hierarchy in some sections."
+      ]
+    },
+    "job_match_analysis": {
+      "relevance_score": 50
+    },
+    "global_analysis": {
+      "formatting_score": 7,
+      "content_score": 5
+    }
+  }
+}

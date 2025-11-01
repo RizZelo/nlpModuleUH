@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-10-31T16:56:42.836701",
+  "cv_text": "Votre nom\nInsérez votre texte ici Insérez votre texte ici\n123 Votre rue\n00000 Votre ville\n(33) 00 00 00 00 00\nno_reply@example.com\nEXPÉRIENCE\nSociété, Lieu —\nFonction\nMOIS 20XX À AUJOURD'HUI\nInsérez votre texte ici Insérez votre texte ici Insérez votre texte ici Insérez votre texte ici.\nSociété, Lieu —\nFonction\nMOIS 20XX À MOIS AAAA\nInsérez votre texte ici Insérez votre texte ici Insérez votre texte ici Insérez votre texte ici.\nSociété, Lieu —\nFonction\nMOIS 20XX À MOIS AAAA\nInsérez votre texte ici Insérez votre texte ici Insérez votre texte ici Insérez votre texte ici.\nFORMATION\nNom de l'établissement, Lieu —\nDiplôme\nMOIS 20XX À MOIS AAAA\nInsérez votre texte ici Insérez votre texte ici Insérez votre texte ici Insérez votre texte ici Insérez votre texte ici.\nNom de l'établissement, Lieu —\nDiplôme\nMOIS 20XX À MOIS AAAA\nInsérez votre texte ici Insérez votre texte ici Insérez votre texte ici.\nPROJETS\nNom du projet —\nDétails\nInsérez votre texte ici Insérez votre texte ici.\nCOMPÉTENCES\nInsérez votre texte ici.\nInsérez votre texte ici.\nInsérez votre texte ici Insérez votre texte ici.\nInsérez votre texte ici Insérez votre texte ici.\nDISTINCTIONS\nInsérez votre texte ici\nInsérez votre texte ici Insérez votre texte ici\nInsérez votre texte ici\nInsérez votre texte ici Insérez votre texte ici.\nInsérez votre texte ici\nInsérez votre texte ici Insérez votre texte ici\nInsérez votre texte ici\nInsérez votre texte ici Insérez votre texte ici.\nLANGUES\nInsérez votre texte ici Insérez votre texte ici",
+  "job_description": "ai engineer\r\n",
+  "statistics": {
+    "total_characters": 1501,
+    "word_count": 250,
+    "line_count": 48
+  },
+  "file_info": {
+    "filename": "CV.docx",
+    "file_size_bytes": 1593792,
+    "extracted_text_length": 1501
+  }
+}

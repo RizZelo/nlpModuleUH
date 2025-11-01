@@ -1,0 +1,118 @@
+{
+  "status": "success",
+  "analysis": {
+    "formatting": {
+      "score": 8,
+      "issues": [
+        "Inconsistent use of bullet points.",
+        "Objective could be better structured as a summary."
+      ],
+      "suggestions": [
+        "Use consistent bullet points or formatting throughout the CV.",
+        "Rewrite the objective as a professional summary highlighting key skills and aspirations related to AI engineering."
+      ]
+    },
+    "content": {
+      "score": 6,
+      "strengths": [
+        "Lists relevant coursework in AI and related fields.",
+        "Includes a range of technical skills relevant to AI, including programming languages, data science tools, and database systems.",
+        "Lists certifications relevant to the field."
+      ],
+      "weaknesses": [
+        "Lacks practical experience and project details.",
+        "Skills are listed without demonstrating proficiency or providing context.",
+        "Extracurricular activities are listed but don't highlight leadership or AI-related contributions.",
+        "Objective is generic and doesn't specify target role within AI."
+      ],
+      "suggestions": [
+        "Include any personal projects, hackathons, or research experience that showcase AI skills.",
+        "Quantify skills by mentioning tools or technologies used in projects.",
+        "Describe the roles in extracurriculars, and highlight any AI-related projects or initiatives.",
+        "Tailor the objective/summary to the specific AI engineer role, emphasizing desired skills and career aspirations.",
+        "Add a 'Projects' section detailing personal or academic projects where you applied your AI skills."
+      ]
+    },
+    "general": {
+      "overall_score": 6,
+      "summary": "The CV presents a good foundation in ICT and a budding interest in AI/ML. However, it lacks concrete examples of practical application and needs to be tailored to showcase skills relevant to an AI Engineer role by highlighting projects and quantifiable achievements.",
+      "top_priorities": [
+        "Add a Projects section showcasing AI-related projects.",
+        "Quantify skills and provide context for technical abilities.",
+        "Tailor the objective/summary to align with the target AI Engineer role."
+      ]
+    },
+    "inline_suggestions": [
+      {
+        "text_snippet": "Freshman ICT engineering student at the Higher School Of Communication Of Tunis with a deep interest in Artificial Intelligence\nand Machine Learning.",
+        "issue_type": "impact",
+        "problem": "The objective is too general and doesn't highlight specific skills or career goals. It also uses the term 'Freshman' which isn't standard CV language.",
+        "suggestion": "Replace with a concise professional summary showcasing AI/ML skills and career aspirations.",
+        "replacement": "Highly motivated ICT engineering student with a strong foundation in AI/ML principles, seeking an entry-level AI Engineer role to leverage skills in Python, Deep Learning, and NLP."
+      },
+      {
+        "text_snippet": "Driven by curiosity and innovation, I’m actively delving into emerging AI technologies and modern machine\nlearning methodologies.",
+        "issue_type": "impact",
+        "problem": "This sentence is vague and doesn't provide any concrete information about your skills or experience.",
+        "suggestion": "Replace this with a quantifiable statement about a project you worked on.",
+        "replacement": "Applied Deep Learning techniques to develop a novel image classification model with 90% accuracy using TensorFlow."
+      },
+      {
+        "text_snippet": "Relevant Coursework: Telecommunication Networks, Artificial Intelligence and Big Data.",
+        "issue_type": "clarity",
+        "problem": "While relevant, this is a basic listing. It doesn't showcase depth of knowledge or specific projects.",
+        "suggestion": "Add specific projects or skills learned within each coursework.",
+        "replacement": "Relevant Coursework: Telecommunication Networks (analyzed network protocols using Wireshark), Artificial Intelligence and Big Data (developed a sentiment analysis model using Python and NLTK)."
+      },
+      {
+        "text_snippet": "Programming Languages: Python, C, C++, MATLAB.",
+        "issue_type": "impact",
+        "problem": "The list is too general; there's no indication of proficiency.",
+        "suggestion": "Quantify the experience by stating levels of proficiency and specific frameworks used.",
+        "replacement": "Programming Languages: Python (Proficient - Scikit-learn, TensorFlow, PyTorch), C, C++, MATLAB."
+      },
+      {
+        "text_snippet": "IEEE Sup’Com, Member\nSep. 2024 - Present\n• Google DSC Sup’Com, Member\nSep. 2024 - Present\n• Team Sup’Com, Member",
+        "issue_type": "impact",
+        "problem": "Listing memberships is weak without specifying what you did.",
+        "suggestion": "Describe your role and any achievements in these organizations, especially if AI-related.",
+        "replacement": "IEEE Sup’Com, Member (Participated in robotics workshops, contributing to software development). Google DSC Sup’Com, Member (Attended AI/ML workshops and hackathons). Team Sup’Com, Member."
+      },
+      {
+        "text_snippet": "Languages: English (upper intermediate), French (intermediate), Arabic (Native Language), Romanian (beginner)",
+        "issue_type": "clarity",
+        "problem": "This is good information but could be more impactful by explicitly stating conversational or written proficiency.",
+        "suggestion": "Provide more specific descriptors.",
+        "replacement": "Languages: English (Fluent, written and spoken), French (Conversational), Arabic (Native Language), Romanian (beginner)."
+      },
+      {
+        "text_snippet": "Specialized Area: Network Telecommunications, ML, DL, Database Systems.",
+        "issue_type": "clarity",
+        "problem": "This is vague and lacks depth. Needs to be more specific or incorporated elsewhere.",
+        "suggestion": "Remove this, and integrate the details into the Skills section or Project Descriptions.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Other Tools & Technologies: Development Tools & Frameworks, AI & Machine Learning Frameworks, Database Management\n& Data Warehousing, UML.",
+        "issue_type": "clarity",
+        "problem": "Too broad and generic. Needs to be specific.",
+        "suggestion": "List specific tools and technologies you have used in each category.",
+        "replacement": "Other Tools & Technologies: IDEs (VS Code, PyCharm), AI Frameworks (TensorFlow, PyTorch, Scikit-learn), Database Management (MySQL, PostgreSQL), UML (StarUML)."
+      },
+      {
+        "text_snippet": "NVIDIA Deep Learning Fundamentals",
+        "issue_type": "impact",
+        "problem": "Lacks context. What did you learn, and how is it relevant?",
+        "suggestion": "Add a brief description of the certification and key skills acquired.",
+        "replacement": "NVIDIA Deep Learning Fundamentals (Certified in developing and deploying deep learning models using TensorFlow)."
+      },
+      {
+        "text_snippet": "Preparatory Institute for Engineering Studies of Monastir\nSep 2022 - Jun. 2024\nPre-Engineering Studies\nMonastir, Tunisia\nRanked: 24/787",
+        "issue_type": "impact",
+        "problem": "The ranking is good but lacks context of what pre-engineering studies covers.",
+        "suggestion": "Include a brief summary of what the pre-engineering studies covers, particularly if related to math or science.",
+        "replacement": "Preparatory Institute for Engineering Studies of Monastir\nSep 2022 - Jun. 2024\nPre-Engineering Studies (focused on advanced mathematics and physics)\nMonastir, Tunisia\nRanked: 24/787"
+      }
+    ]
+  }
+}

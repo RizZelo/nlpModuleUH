@@ -1,0 +1,20 @@
+{
+  "status": "success",
+  "analysis": {
+    "overall_score": 75,
+    "ats_score": 68,
+    "readability_score": 82,
+    "summary": "This is a well-structured CV with room for improvement in ATS optimization.",
+    "critical_issues": [
+      "Missing quantifiable achievements in experience section",
+      "Weak action verbs in 3 bullet points"
+    ],
+    "inline_suggestions": [],
+    "section_analysis": [],
+    "quick_wins": [],
+    "top_priorities": [],
+    "grammar_and_clarity": {},
+    "job_match_analysis": {},
+    "global_analysis": {}
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "status": "success",
+  "analysis": {
+    "overall_score": 70,
+    "ats_score": 70,
+    "readability_score": 88,
+    "summary": "The CV presents a motivated student with a good range of relevant skills and experiences. However, it needs to be improved by quantifying accomplishments, providing more specific details in project descriptions, and explicitly connecting projects to backend development concepts.",
+    "critical_issues": [
+      "Inconsistent date formats (e.g., Juillet / Août 2025 vs. 2024 - Présent).",
+      "Excessive use of underlines.",
+      "Lack of clear spacing between sections in some instances.",
+      "Uneven indentation/alignment in some sections (e.g., 'VIE ASSOCIATIVE ET CLUB').",
+      "The connection between projects and backend is not always explicit. Need to highlight how projects involved backend skills.",
+      "Lacks specific quantifiable achievements. Needs more metrics to prove impact.",
+      "The descriptions for projects and experiences are quite general and could be more specific and detailed."
+    ],
+    "inline_suggestions": [
+      {
+        "text_snippet": "Mise en place et validation d’un banc d’essai 5G SA (Standalone) avec intégration SIM et gNB.",
+        "issue_type": "impact",
+        "problem": "This is too vague. What was the outcome of setting up and validating the 5G test bench? What specific technologies were used?",
+        "suggestion": "Implemented and validated a 5G SA test bench with SIM and gNB integration, achieving X% improvement in Y metric using Z technology.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Conception d’antennes log-périodiques",
+        "issue_type": "keyword",
+        "problem": "Irrelevant to backend role",
+        "suggestion": "While impressive, this is irrelevant to backend; consider removing or minimizing it.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Système de minuteur et de chronométrage :  Développement d’un minuteur/chronomètre numérique, programmé en VHDL sur FPGA, avec\naffichage précis sur écrans à 7 segments.",
+        "issue_type": "keyword",
+        "problem": "This project isn't directly relevant to backend development.",
+        "suggestion": "Unless specifically related to time-series data processing or a similar relevant backend task, this could be shortened or removed to focus on more relevant projects.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Système d’authentification en C++ :  Création d’un programme console permettant l’inscription et la connexion des utilisateurs, avec gestion des\nmots de passe et des fichiers.",
+        "issue_type": "impact",
+        "problem": "While relevant, it lacks details. How was the password management implemented (hashing, salting)? What security considerations were addressed?",
+        "suggestion": "Developed a user authentication system in C++ with secure password management (hashing with salt) and file-based user data storage. Implemented X security measures.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Système de gestion des transports publics : Conception d’une base de données MySQL pour gérer véhicules, utilisateurs et billets, avec interface\ngraphique pour faciliter l’utilisation.",
+        "issue_type": "impact",
+        "problem": "This is a good project, but needs more backend specifics. What was the database schema like? How was data accessed and manipulated? Was an API used?",
+        "suggestion": "Designed a MySQL database schema for a public transport management system, including tables for vehicles, users, and tickets. Developed API endpoints for data access and manipulation.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Projet PACTE – Initiative éducative et sociale",
+        "issue_type": "keyword",
+        "problem": "Irrelevant to the Job Description.",
+        "suggestion": "Consider removing or shortening this section to focus on more technically relevant experiences.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Valorisation du patrimoine alimentaire à Nabeul",
+        "issue_type": "keyword",
+        "problem": "Irrelevant to the Job Description.",
+        "suggestion": "Consider removing or shortening this section to focus on more technically relevant experiences.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Programmation : Python, C/C++, POO, MATLAB, Langage Assembleur, VHDL.",
+        "issue_type": "clarity",
+        "problem": "Consider specifying proficiency levels or relevant libraries. Are you proficient with Flask/Django for Python? What C++ libraries have you used?",
+        "suggestion": "Programming: Python (Flask, Django), C/C++ (STL, Boost), MATLAB",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Développement web et mobiles : HTML, CSS, JavaScript, PHP.",
+        "issue_type": "keyword",
+        "problem": "While useful, these are generally considered front-end technologies. Reiterate the back-end applications of these (e.g., using PHP for backend API development).",
+        "suggestion": "Web Development: HTML, CSS, JavaScript (for light front-end interactions). PHP (for backend API development).",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Ecole Supérieure de Communication de Tunis ( SUP’COM ).",
+        "issue_type": "formatting",
+        "problem": "Missing Start Date",
+        "suggestion": "Ecole Supérieure de Communication de Tunis (SUP’COM) | September 2022 - Present",
+        "replacement": "Ecole Supérieure de Communication de Tunis (SUP’COM) | September 2022 - Present"
+      }
+    ],
+    "section_analysis": [
+      "Demonstrates a wide range of technical skills relevant to backend development (e.g., Python, C/C++, MySQL).",
+      "Includes impressive certifications relevant to modern backend development (e.g., NVIDIA Deep Learning, AI, Red Hat).",
+      "Highlights involvement in relevant projects (database management, system authentication).",
+      "Shows initiative through involvement in extracurricular activities and leadership roles."
+    ],
+    "quick_wins": [
+      "For each project, clearly state how the technologies used are relevant to backend development. For example, specify what kind of database design or API work was done.",
+      "Quantify achievements whenever possible. E.g., 'Improved database performance by X%'.",
+      "Provide more details about the scope and impact of each experience, project, and activity. Use action verbs to describe responsibilities and accomplishments."
+    ],
+    "top_priorities": [
+      "Quantify achievements and provide metrics.",
+      "Add more detail to project descriptions and specify the role of each technology.",
+      "Tailor project and experience descriptions to highlight relevance to backend development."
+    ],
+    "grammar_and_clarity": {
+      "issues": [
+        "Inconsistent date formats (e.g., Juillet / Août 2025 vs. 2024 - Présent).",
+        "Excessive use of underlines.",
+        "Lack of clear spacing between sections in some instances.",
+        "Uneven indentation/alignment in some sections (e.g., 'VIE ASSOCIATIVE ET CLUB')."
+      ]
+    },
+    "job_match_analysis": {
+      "relevance_score": 70
+    },
+    "global_analysis": {
+      "formatting_score": 7,
+      "content_score": 7
+    }
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "status": "success",
+  "analysis": {
+    "overall_score": 60,
+    "ats_score": 65,
+    "readability_score": 88,
+    "summary": "The CV demonstrates a solid foundation in backend development and data automation but needs significant tailoring to align with the requirements of an AI Engineer role. The candidate should focus on highlighting AI-related skills, experiences, and projects. Improvement in formatting and clarity will also be beneficial.",
+    "critical_issues": [
+      "Inconsistent use of bolding and capitalization.",
+      "Special characters are used incorrectly (e.g., 'PoﬆgreSQL', 'teﬆing').",
+      "Date format inconsistencies (e.g., 'sept.' vs. 'août').",
+      "The resume lacks specific details about AI-related skills, considering the target role of AI Engineer.",
+      "The description of the 'Sonotrak' role is too detailed for a non-technical position and doesn't highlight transferable skills well.",
+      "The 'Education' section shows ongoing studies, which might be seen as a negative if not balanced with relevant experience."
+    ],
+    "inline_suggestions": [
+      {
+        "text_snippet": "PoﬆgreSQL",
+        "issue_type": "formatting",
+        "problem": "Incorrect special character used.",
+        "suggestion": "Correct the special character.",
+        "replacement": "PostgreSQL"
+      },
+      {
+        "text_snippet": "Resourceful Developer with hands- on experience in backend development and data automation.",
+        "issue_type": "impact",
+        "problem": "The summary is generic and doesn't highlight any specific achievements or AI-related skills.",
+        "suggestion": "Rewrite the summary to highlight AI-related skills and quantifiable achievements.",
+        "replacement": "Results-driven Developer experienced in backend development, data automation, and machine learning. Proficient in Python, Flask, and data analysis techniques."
+      },
+      {
+        "text_snippet": "Engineering Degree in Data Science – 1ﬆ Year",
+        "issue_type": "clarity",
+        "problem": "Specifying '1st Year' might be seen as a negative. It's better to emphasize relevant coursework or skills gained so far.",
+        "suggestion": "Rephrase to focus on relevant coursework or skills.",
+        "replacement": "Engineering Degree in Data Science (Expected Graduation: [Year])"
+      },
+      {
+        "text_snippet": "JavaScript, Python, Web Services, C, HTML5, CSS, SQL, User Interface, Assembly, Docker, Linux, Git",
+        "issue_type": "keyword",
+        "problem": "Skills section is too broad. Highlight skills most relevant to AI Engineering and expand on AI-specific technologies.",
+        "suggestion": "Prioritize and expand on relevant skills, adding AI-specific keywords.",
+        "replacement": "Python, Flask, PostgreSQL, Docker, Linux, Git, Machine Learning (Scikit-learn), Data Analysis, Web Scraping"
+      },
+      {
+        "text_snippet": "Freelance Python Developer\nmars, 2025 - Present",
+        "issue_type": "clarity",
+        "problem": "The 'Present' date is in the future. Assume this is a typo and change to an earlier date, or 'Present' is only true if the resume creation date is after March 2025, but unlikely.",
+        "suggestion": "Confirm and correct date if an error, and elaborate on achievements to showcase skills.",
+        "replacement": "Freelance Python Developer\n[Month], 2023 - Present"
+      },
+      {
+        "text_snippet": "Worked with clients to automate repetitive tasks, improve data collection efﬁciency, and deliver clean, usable datasets",
+        "issue_type": "impact",
+        "problem": "This is vague. Quantify the improvements whenever possible.",
+        "suggestion": "Add specific metrics to quantify the improvements.",
+        "replacement": "Automated repetitive tasks for clients, resulting in a 20% improvement in data collection efficiency and delivery of clean, usable datasets."
+      },
+      {
+        "text_snippet": "Sonotrak\naoût, 2024 - sept., 2024\nTicketing Agent",
+        "issue_type": "relevance",
+        "problem": "This role is not directly relevant to an AI Engineering position. The description focuses on customer service and software limitations, not transferable technical skills.",
+        "suggestion": "Condense the description to one line and focus on transferable skills if possible, or remove it if it does not demonstrate relevant skills.",
+        "replacement": "Sonotrak (Ticketing Agent): Proposed digital transformation plan to improve ticketing flexibility and user experience."
+      },
+      {
+        "text_snippet": "Basic penetration teﬆing",
+        "issue_type": "relevance",
+        "problem": "This skill is not directly relevant to an AI engineer role and can be removed to save space.",
+        "suggestion": "Remove irrelevant skill.",
+        "replacement": ""
+      },
+      {
+        "text_snippet": "Subreddit Activity Tracker",
+        "issue_type": "clarity",
+        "problem": "While the description is good, it doesn't explicitly mention any AI-related aspects or data analysis techniques used. Did you perform any sentiment analysis or create any predictive models based on the data?",
+        "suggestion": "Add details about any AI or data analysis techniques used in the project.",
+        "replacement": "Subreddit Activity Tracker: ... [Add sentence about sentiment analysis, predictive modeling, etc., if applicable.]"
+      },
+      {
+        "text_snippet": "Created and launched a small clothing brand focused on personalized t- shirt designs",
+        "issue_type": "relevance",
+        "problem": "While showing entrepreneurial spirit, this project is not directly related to the target job description. Consider if it demonstrates any relevant skills.",
+        "suggestion": "Unless the skill demonstrated is highly relevant, consider removing this section to save space.",
+        "replacement": ""
+      }
+    ],
+    "section_analysis": [
+      "Demonstrates experience with relevant technologies like Python, Flask, and PostgreSQL.",
+      "Includes project examples showcasing practical application of skills.",
+      "Highlights experience in web scraping and data automation, which are valuable for AI applications."
+    ],
+    "quick_wins": [
+      "Explicitly mention AI-related skills, libraries, or frameworks used in projects (e.g., TensorFlow, PyTorch, scikit-learn).",
+      "Tailor the 'Work Experience' section to emphasize skills relevant to AI engineering, even in non-technical roles.",
+      "Provide more detail about the 'Engineering Degree' to make it more relevant to the AI Engineer role."
+    ],
+    "top_priorities": [
+      "Highlight AI-related skills and projects.",
+      "Tailor experience descriptions to emphasize transferable skills relevant to AI Engineering.",
+      "Improve formatting and correct special characters."
+    ],
+    "grammar_and_clarity": {
+      "issues": [
+        "Inconsistent use of bolding and capitalization.",
+        "Special characters are used incorrectly (e.g., 'PoﬆgreSQL', 'teﬆing').",
+        "Date format inconsistencies (e.g., 'sept.' vs. 'août')."
+      ]
+    },
+    "job_match_analysis": {
+      "relevance_score": 60
+    },
+    "global_analysis": {
+      "formatting_score": 7,
+      "content_score": 6
+    }
+  }
+}
