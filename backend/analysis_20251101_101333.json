@@ -1,0 +1,118 @@
+{
+  "status": "success",
+  "analysis": {
+    "overall_score": 70,
+    "ats_score": 70,
+    "readability_score": 88,
+    "summary": "The CV presents a motivated and skilled student with a strong foundation in computer science and emerging AI skills. However, it needs to be more targeted towards the AI engineer role, with greater emphasis on AI-related projects and skills and better quantifications of achievements.",
+    "critical_issues": [
+      "Inconsistent use of bolding and capitalization.",
+      "Date formats are not consistent (e.g., Juillet / Août 2025 vs 2024 - Present).",
+      "Spacing issues exist throughout the document (e.g. extra spaces before periods).",
+      "Lacks specific details on AI projects. Quantify achievements whenever possible.",
+      "The job description is for AI Engineer; therefore, the experience should be more focused on AI-related tasks and projects. Some listed projects lack relevance.",
+      "The 'About Me' section at the beginning is too generic; needs to be tailored to an AI Engineer role."
+    ],
+    "inline_suggestions": [
+      {
+        "text_snippet": "motivé par l’innovation technologique et la conception de solutions face\nà des problématiques complexes.",
+        "issue_type": "impact",
+        "problem": "This is a generic statement. It doesn't specify any AI related focus.",
+        "suggestion": "Motivated by applying AI and machine learning techniques to develop innovative solutions for complex technological problems.",
+        "replacement": "Motivated by applying AI and machine learning techniques to develop innovative solutions for complex technological problems."
+      },
+      {
+        "text_snippet": "Stage d’été en 5G - Orange Tunisie & IEEE Technical Activities Tunisia Section - Juillet / Août 2025",
+        "issue_type": "clarity",
+        "problem": "The relevance of this stage to an AI engineer position is unclear. What was the AI-related aspect of it?",
+        "suggestion": "Clarify the AI-related components of the 5G internship.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Préparation de cas d’usage et démonstrations pour un hackathon 5G.",
+        "issue_type": "impact",
+        "problem": "This is too vague. What kind of use cases? How did you contribute?",
+        "suggestion": "Developed and presented three use cases for a 5G hackathon, focusing on [mention specific application, e.g., AI-powered network optimization].",
+        "replacement": "Developed and presented three use cases for a 5G hackathon, focusing on [mention specific application, e.g., AI-powered network optimization]."
+      },
+      {
+        "text_snippet": "Conception d’antennes log-périodiques : Conception, simulation et réalisation d’une antenne log-périodique à large bande, testée avec succès sur\ntoute la gamme de fréquences prévue.",
+        "issue_type": "relevance",
+        "problem": "While impressive, the relevance to AI engineering isn't immediately obvious.  If there's an AI/ML aspect, clarify.",
+        "suggestion": "Unless AI/ML was involved, consider removing or significantly shortening this.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Système d’authentification en C++ :  Création d’un programme console permettant l’inscription et la connexion des utilisateurs, avec gestion des\nmots de passe et des fichiers.",
+        "issue_type": "relevance",
+        "problem": "C++ skills are valuable, but this project isn't directly related to AI. Could be shortened or removed.",
+        "suggestion": "Shorten or remove this project to prioritize AI-related projects.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Projet PACTE – Initiative éducative et sociale",
+        "issue_type": "relevance",
+        "problem": "The relevance to the AI engineer role is minimal. Highlight any AI/tech skills used.",
+        "suggestion": "If robotics clubs involve AI, describe the AI elements. Otherwise, reduce the emphasis.",
+        "replacement": null
+      },
+      {
+        "text_snippet": "Certificat Créez votre premier chatbot basé sur l’IA générative TALAN.",
+        "issue_type": "impact",
+        "problem": "Too general. The impact on the CV can be boosted by briefly explaining the chatbot creation process.",
+        "suggestion": "Certificat Créez votre premier chatbot basé sur l’IA générative TALAN. (e.g., Implemented an end-to-end generative AI chatbot using TALAN, focusing on natural language processing.)",
+        "replacement": "Certificat Créez votre premier chatbot basé sur l’IA générative TALAN. (e.g., Implemented an end-to-end generative AI chatbot using TALAN, focusing on natural language processing.)"
+      },
+      {
+        "text_snippet": "École Supérieure de Communication de Tunis ( SUP’COM ).",
+        "issue_type": "clarity",
+        "problem": "Indicate that this is for a degree in Telecommunications and Computer Science, to clarify its relevance.",
+        "suggestion": "École Supérieure de Communication de Tunis (SUP’COM) - Telecommunications and Computer Science Degree",
+        "replacement": "École Supérieure de Communication de Tunis (SUP’COM) - Telecommunications and Computer Science Degree"
+      },
+      {
+        "text_snippet": "Programmation : Python, C/C++, POO, MATLAB, Langage Assembleur, VHDL.",
+        "issue_type": "impact",
+        "problem": "Needs to be more specific about AI-related skills within these languages. E.g., mention libraries used, like TensorFlow or PyTorch.",
+        "suggestion": "Programming: Python (TensorFlow, PyTorch, Scikit-learn), C/C++, MATLAB",
+        "replacement": "Programming: Python (TensorFlow, PyTorch, Scikit-learn), C/C++, MATLAB"
+      },
+      {
+        "text_snippet": "Système de gestion des transports publics : Conception d’une base de données MySQL pour gérer véhicules, utilisateurs et billets, avec interface\ngraphique pour faciliter l’utilisation.",
+        "issue_type": "relevance",
+        "problem": "Irrelevant to AI engineering role.",
+        "suggestion": "Consider removing it unless you've incorporated some AI/ML",
+        "replacement": null
+      }
+    ],
+    "section_analysis": [
+      "Highlights relevant technical skills, particularly in programming and AI-related areas.",
+      "Includes several AI-related certifications from reputable sources like NVIDIA and TALAN.",
+      "Demonstrates practical experience through projects, including humanitarians projects."
+    ],
+    "quick_wins": [
+      "Quantify the impact of your projects and experiences with metrics wherever possible.",
+      "Elaborate on AI-related projects, detailing the algorithms, models, or techniques used.",
+      "Tailor the 'About Me' section to highlight your specific interest and skills in AI engineering."
+    ],
+    "top_priorities": [
+      "Refocus the CV content on AI and ML-related projects and experiences.",
+      "Quantify achievements and impact of projects and activities.",
+      "Tailor the introductory statement to reflect a strong AI engineering focus."
+    ],
+    "grammar_and_clarity": {
+      "issues": [
+        "Inconsistent use of bolding and capitalization.",
+        "Date formats are not consistent (e.g., Juillet / Août 2025 vs 2024 - Present).",
+        "Spacing issues exist throughout the document (e.g. extra spaces before periods)."
+      ]
+    },
+    "job_match_analysis": {
+      "relevance_score": 70
+    },
+    "global_analysis": {
+      "formatting_score": 7,
+      "content_score": 7
+    }
+  }
+}
