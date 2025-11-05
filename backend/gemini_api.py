@@ -1,6 +1,9 @@
 from google import generativeai as genai
 import json
 import re
+import logging
+
+logger = logging.getLogger(__name__)
 
 def analyze_cv_with_gemini(cv_text: str, job_description: str, api_key: str):
     """
@@ -85,15 +88,15 @@ Be specific, actionable, and honest in your assessment.
         }
         
     except json.JSONDecodeError as e:
-        print(f"❌ JSON parsing error: {str(e)}")
-        print(f"Raw response: {response_text[:500]}")
+        logger.error(f"❌ JSON parsing error: {str(e)}")
+        logger.debug(f"Raw response: {response_text[:500]}")
         return {
             "error": "Failed to parse Gemini response as JSON",
             "raw_response": response_text[:500]
         }
     
     except Exception as e:
-        print(f"❌ Gemini API error: {str(e)}")
+        logger.error(f"❌ Gemini API error: {str(e)}", exc_info=True)
         return {
             "error": f"Gemini API error: {str(e)}"
         }

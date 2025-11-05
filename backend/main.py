@@ -6,12 +6,20 @@ from google import generativeai as genai
 import tempfile
 import os
 import json
+import logging
 from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
 # Suppress gRPC warnings
 os.environ['GRPC_VERBOSITY'] = 'ERROR'
 os.environ['GLOG_minloglevel'] = '2'
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -24,11 +32,14 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_API_KEY_HERE")
 # - "gemini-1.5-flash" (good balance)
 GEMINI_MODEL = genai.GenerativeModel(model_name="gemini-2.5-flash")
 
+# CORS Configuration - restrict in production
+ALLOWED_ORIGINS = os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+logger.info(f"CORS allowed origins: {ALLOWED_ORIGINS}")
 
-# Allow requests from your React frontend
+# Configure CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # For development; use your React URL in production
+    allow_origins=ALLOWED_ORIGINS,  # Configurable via environment variable
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,17 +56,17 @@ async def analyze(
     Handle CV file upload or raw text, save to JSON, and analyze with Gemini
     """
     
-    print("\n" + "="*50)
-    print("NEW REQUEST RECEIVED")
-    print("="*50)
+    logger.info("="*50)
+    logger.info("NEW REQUEST RECEIVED")
+    logger.info("="*50)
 
     # If a file was uploaded, save it temporarily and parse it
     text = cv_text
     file_info = {}
     
     if cv_file:
-        print(f"📄 File uploaded: {cv_file.filename}")
-        print(f"📄 Content type: {cv_file.content_type}")
+        logger.info(f"📄 File uploaded: {cv_file.filename}")
+        logger.info(f"📄 Content type: {cv_file.content_type}")
         
         try:
             # Get file extension
@@ -67,20 +78,20 @@ async def analyze(
                 tmp.write(content)
                 tmp_path = tmp.name
             
-            print(f"💾 Saved to temp file: {tmp_path}")
-            print(f"📏 File size: {len(content)} bytes")
+            logger.info(f"💾 Saved to temp file: {tmp_path}")
+            logger.info(f"📏 File size: {len(content)} bytes")
             
             # Parse the document
-            print("🔄 Parsing document...")
+            logger.info("🔄 Parsing document...")
             text = parse_document(tmp_path)
             
             # Clean up temp file
             os.unlink(tmp_path)
             
             if text:
-                print(f"✅ Successfully extracted text")
-                print(f"📏 Extracted text length: {len(text)} characters")
-                print(f"📝 First 200 chars: {text[:200]}...")
+                logger.info(f"✅ Successfully extracted text")
+                logger.info(f"📏 Extracted text length: {len(text)} characters")
+                logger.info(f"📝 First 200 chars: {text[:200]}...")
                 
                 file_info = {
                     "filename": cv_file.filename,
@@ -88,33 +99,31 @@ async def analyze(
                     "extracted_text_length": len(text)
                 }
             else:
-                print("❌ Parser returned None")
+                logger.error("❌ Parser returned None")
                 return {"error": "Failed to extract text from file"}
                 
         except Exception as e:
-            print(f"❌ Error processing file: {str(e)}")
-            import traceback
-            traceback.print_exc()
+            logger.error(f"❌ Error processing file: {str(e)}", exc_info=True)
             return {"error": f"Failed to process file: {str(e)}"}
     
     elif cv_text:
-        print(f"📝 Raw text provided: {len(cv_text)} characters")
-        print(f"📝 First 100 chars: {cv_text[:100]}...")
+        logger.info(f"📝 Raw text provided: {len(cv_text)} characters")
+        logger.info(f"📝 First 100 chars: {cv_text[:100]}...")
     
     if not text:
-        print("❌ No CV text provided")
+        logger.error("❌ No CV text provided")
         return {"error": "No CV text provided"}
 
-    print(f"\n📋 Job description length: {len(job_description)} characters")
+    logger.info(f"\n📋 Job description length: {len(job_description)} characters")
     
     # Calculate some basic statistics
     word_count = len(text.split())
     line_count = len(text.split('\n'))
     
-    print(f"\n📊 Statistics:")
-    print(f"   - Total characters: {len(text)}")
-    print(f"   - Word count: {word_count}")
-    print(f"   - Line count: {line_count}")
+    logger.info(f"\n📊 Statistics:")
+    logger.info(f"   - Total characters: {len(text)}")
+    logger.info(f"   - Word count: {word_count}")
+    logger.info(f"   - Line count: {line_count}")
     
     # Create JSON data structure
     cv_data = {
@@ -129,36 +138,38 @@ async def analyze(
         "file_info": file_info if cv_file else {"source": "raw_text"}
     }
     
-    # Save to JSON file
-    output_filename = f"cv_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    # TODO: Save to database instead of JSON files (Issue 1.2)
+    # For now, save to temp directory to avoid polluting working directory
+    temp_dir = tempfile.gettempdir()
+    output_filename = os.path.join(temp_dir, f"cv_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
     
     try:
         with open(output_filename, 'w', encoding='utf-8') as f:
             json.dump(cv_data, f, indent=2, ensure_ascii=False)
         
-        print(f"\n💾 Saved CV data to: {output_filename}")
-        print("="*50 + "\n")
+        logger.info(f"\n💾 Saved CV data to: {output_filename}")
+        logger.info("="*50 + "\n")
         
     except Exception as e:
-        print(f"❌ Error saving JSON: {str(e)}")
+        logger.error(f"❌ Error saving JSON: {str(e)}")
         return {"error": f"Failed to save JSON: {str(e)}"}
     
     # Analyze with Gemini if requested
     gemini_analysis = None
     if use_gemini:
-        print("⚠️  Gemini API key: ", GEMINI_API_KEY)
+        logger.info("⚠️  Gemini API key configured: %s", "Yes" if GEMINI_API_KEY != "YOUR_API_KEY_HERE" else "No")
         
-        print("🤖 Analyzing CV with Gemini...")
+        logger.info("🤖 Analyzing CV with Gemini...")
         gemini_analysis = analyze_cv_with_gemini(text, job_description, GEMINI_API_KEY)
         
-        # Save Gemini analysis to separate file
+        # Save Gemini analysis to temp directory
         if gemini_analysis and 'error' not in gemini_analysis:
-            analysis_filename = f"analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            analysis_filename = os.path.join(temp_dir, f"analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
             with open(analysis_filename, 'w', encoding='utf-8') as f:
                 json.dump(gemini_analysis, f, indent=2, ensure_ascii=False)
-            print(f"💾 Saved Gemini analysis to: {analysis_filename}")
+            logger.info(f"💾 Saved Gemini analysis to: {analysis_filename}")
         else:
-            print("hello");    
+            logger.warning("Gemini analysis returned error or no data")
     
     # Return response to frontend
     response = {
@@ -177,7 +188,7 @@ async def analyze(
     }
     
     # Add Gemini analysis to response if available
-    print(gemini_analysis)
+    logger.debug(f"Gemini analysis: {gemini_analysis}")
     if gemini_analysis:
         response["gemini_analysis"] = gemini_analysis
     
