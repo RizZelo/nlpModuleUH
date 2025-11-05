@@ -1,4 +1,225 @@
-# Getting Started with Create React App
+# CV NLP Analyzer
+
+An intelligent CV analysis tool that uses AI (Google Gemini) to provide detailed feedback on CVs against job descriptions. The application helps job seekers optimize their CVs with actionable suggestions for formatting, content, and keyword optimization.
+
+## Features
+
+- 📄 **Multi-format Support**: Upload CVs in PDF, DOCX, or paste text directly
+- 🤖 **AI-Powered Analysis**: Leverages Google Gemini for comprehensive CV evaluation
+- 📊 **Detailed Scoring**: Overall, formatting, and content scores with explanations
+- 💡 **Inline Suggestions**: Specific, actionable recommendations with text replacement
+- ✏️ **Interactive Editor**: Edit your CV directly with inline suggestion overlays
+- 📥 **Export**: Download your edited CV
+- 🎯 **Job-Specific**: Tailored analysis based on target job description
+
+## Project Structure
+
+```
+nlpModuleUH/
+├── backend/               # FastAPI backend
+│   ├── main.py           # Main API endpoints
+│   ├── parser.py         # CV parsing (PDF, DOCX, TXT)
+│   ├── gemini_api.py     # Gemini AI integration
+│   └── requirements.txt  # Python dependencies
+└── frontend/             # React frontend
+    ├── src/
+    │   ├── components/   # Reusable React components
+    │   ├── services/     # API service layer
+    │   ├── utils/        # Utility functions
+    │   └── config.js     # Configuration
+    └── package.json      # Node dependencies
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.8+
+- Node.js 14+
+- Google Gemini API key ([Get one here](https://makersuite.google.com/app/apikey))
+
+### Backend Setup
+
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+
+2. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Create environment file:
+   ```bash
+   cp .env.example .env
+   ```
+
+4. Edit `.env` and add your Gemini API key:
+   ```bash
+   GEMINI_API_KEY=your_api_key_here
+   CORS_ORIGINS=http://localhost:3000
+   ```
+
+5. Start the backend server:
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+The API will be available at `http://localhost:8000`
+
+### Frontend Setup
+
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+
+2. Install Node dependencies:
+   ```bash
+   npm install
+   ```
+
+3. (Optional) Create environment file:
+   ```bash
+   cp .env.example .env
+   ```
+
+4. Start the development server:
+   ```bash
+   npm start
+   ```
+
+The application will open at `http://localhost:3000`
+
+## Usage
+
+1. **Upload or Paste CV**: Choose to upload a PDF/DOCX file or paste CV text directly
+2. **Enter Job Description**: Paste the target job description
+3. **Analyze**: Click "Analyze CV" to get AI-powered feedback
+4. **Review Results**: View scores, issues, and recommendations
+5. **Edit**: Make changes directly in the editor
+6. **Apply Suggestions**: Click highlighted text to see and apply specific suggestions
+7. **Download**: Export your improved CV
+
+## API Documentation
+
+Once the backend is running, visit `http://localhost:8000/docs` for interactive API documentation.
+
+### Key Endpoints
+
+- `GET /` - Health check
+- `POST /analyze` - Analyze CV against job description
+- `GET /latest-cv` - Get most recent CV data
+- `GET /latest-analysis` - Get most recent analysis
+
+## Configuration
+
+### Backend Configuration
+
+Environment variables (`.env`):
+- `GEMINI_API_KEY` - Your Google Gemini API key (required)
+- `CORS_ORIGINS` - Comma-separated list of allowed origins (default: `http://localhost:3000`)
+- `LOG_LEVEL` - Logging level (default: `INFO`)
+
+### Frontend Configuration
+
+Environment variables (`.env`):
+- `REACT_APP_API_URL` - Backend API URL (default: `http://127.0.0.1:8000`)
+
+Application config (`src/config.js`):
+- `MAX_FILE_SIZE_MB` - Maximum upload size (default: 10MB)
+- `ACCEPTED_FILE_TYPES` - Supported file extensions
+- `EDITOR_HEIGHT` - CV editor height
+
+## Production Deployment
+
+See [PRODUCTION_IMPROVEMENTS.md](./PRODUCTION_IMPROVEMENTS.md) for detailed production deployment guidelines.
+
+### Quick Production Checklist
+
+- [ ] Set proper `CORS_ORIGINS` environment variable
+- [ ] Use production-grade database (PostgreSQL) instead of temp files
+- [ ] Implement user authentication
+- [ ] Set up HTTPS
+- [ ] Configure logging aggregation
+- [ ] Set up monitoring and error tracking
+- [ ] Implement rate limiting
+- [ ] Add caching layer
+
+## Development
+
+### Running Tests
+
+Frontend:
+```bash
+cd frontend
+npm test
+```
+
+Backend:
+```bash
+cd backend
+python -m pytest
+```
+
+### Code Quality
+
+The codebase follows these principles:
+- **Single Responsibility**: Each component/module has one clear purpose
+- **DRY**: No code duplication
+- **Separation of Concerns**: UI, logic, and API are separate
+- **Configuration Centralization**: All configurable values in dedicated files
+- **Proper Logging**: Structured logging throughout
+
+## Architecture Improvements
+
+This project has undergone significant refactoring for production readiness:
+
+- ✅ Replaced `print()` with proper logging
+- ✅ Extracted monolithic 548-line component into modular structure
+- ✅ Separated API logic from UI components
+- ✅ Centralized configuration management
+- ✅ Fixed CORS security issues
+- ✅ Improved file storage (temp directory instead of working directory)
+- ✅ Added proper file type validation
+- ✅ Eliminated code duplication
+
+See [PRODUCTION_IMPROVEMENTS.md](./PRODUCTION_IMPROVEMENTS.md) for complete details.
+
+## Technologies
+
+### Backend
+- **FastAPI** - Modern Python web framework
+- **Google Generative AI (Gemini)** - AI-powered CV analysis
+- **PyPDF2 / PyMuPDF** - PDF parsing
+- **python-docx** - DOCX parsing
+- **Uvicorn** - ASGI server
+
+### Frontend
+- **React** - UI framework
+- **Tailwind CSS** - Styling
+- **Lucide React** - Icons
+
+## Contributing
+
+1. Follow the existing code structure and patterns
+2. Maintain single responsibility principle
+3. Use proper logging (not `print()`)
+4. Update documentation for new features
+5. Test your changes
+
+## License
+
+[Add your license here]
+
+## Support
+
+For issues and questions, please [open an issue](https://github.com/RizZelo/nlpModuleUH/issues).
+
+---
+
+## Original Create React App Documentation
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
