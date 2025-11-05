@@ -2,7 +2,6 @@ from google import generativeai as genai
 import json
 import re
 from PIL import Image
-import io
 
 def analyze_cv_with_gemini(cv_text: str, job_description: str, api_key: str, cv_images: list = None):
     """

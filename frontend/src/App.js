@@ -8,6 +8,24 @@ export default function CVAnalyzer() {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingStage, setLoadingStage] = useState('');
+  
+  // Loading stage constants
+  const LOADING_STAGES = {
+    UPLOADING: 'Uploading CV...',
+    EXTRACTING: 'Extracting text and layout...',
+    ANALYZING: 'Analyzing with AI...',
+    PREPARING: 'Preparing suggestions...'
+  };
+  
+  const getLoadingProgress = (stage) => {
+    switch(stage) {
+      case LOADING_STAGES.UPLOADING: return 25;
+      case LOADING_STAGES.EXTRACTING: return 50;
+      case LOADING_STAGES.ANALYZING: return 75;
+      case LOADING_STAGES.PREPARING: return 90;
+      default: return 0;
+    }
+  };
   const [editedCvText, setEditedCvText] = useState('');
   const [inlineSuggestions, setInlineSuggestions] = useState([]);
   const [activeSuggestion, setActiveSuggestion] = useState(null);
@@ -23,7 +41,7 @@ export default function CVAnalyzer() {
 
   const handleAnalyze = async () => {
     setLoading(true);
-    setLoadingStage('Uploading CV...');
+    setLoadingStage(LOADING_STAGES.UPLOADING);
 
     const formData = new FormData();
     if (cvFile) {
@@ -34,17 +52,17 @@ export default function CVAnalyzer() {
     formData.append("job_description", jobDesc);
 
     try {
-      setLoadingStage('Extracting text and layout...');
+      setLoadingStage(LOADING_STAGES.EXTRACTING);
       
       const response = await fetch("http://127.0.0.1:8000/analyze", {
         method: "POST",
         body: formData,
       });
 
-      setLoadingStage('Analyzing with AI...');
+      setLoadingStage(LOADING_STAGES.ANALYZING);
       const data = await response.json();
       
-      setLoadingStage('Preparing suggestions...');
+      setLoadingStage(LOADING_STAGES.PREPARING);
       
       if (data.gemini_analysis?.error) {
         alert("Gemini Error: " + data.gemini_analysis.error);
@@ -198,11 +216,7 @@ export default function CVAnalyzer() {
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
                   className="bg-blue-600 h-2 rounded-full transition-all duration-500"
-                  style={{ 
-                    width: loadingStage.includes('Uploading') ? '25%' : 
-                           loadingStage.includes('Extracting') ? '50%' : 
-                           loadingStage.includes('Analyzing') ? '75%' : '90%' 
-                  }}
+                  style={{ width: `${getLoadingProgress(loadingStage)}%` }}
                 ></div>
               </div>
             </div>

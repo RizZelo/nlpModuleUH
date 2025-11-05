@@ -6,6 +6,7 @@ Extracts and cleans text from PDF, DOCX, and TXT files.
 import re
 import os
 from typing import Optional
+from io import BytesIO
 
 # Import libraries for different file formats
 try:
@@ -54,7 +55,7 @@ def parse_document_with_images(file_path: str) -> dict:
     _, file_extension = os.path.splitext(file_path)
     file_extension = file_extension.lower()
     
-    if file_extension == '.pdf' and text:
+    if file_extension == '.pdf':
         print("🖼️  Extracting PDF pages as images for visual analysis...")
         images = pdf_to_images(file_path)
         result['images'] = images
@@ -307,7 +308,6 @@ def pdf_to_images(file_path: str, output_dir: str = None) -> list:
                 
                 # Convert to PIL Image
                 img_data = pix.tobytes("png")
-                from io import BytesIO
                 img = Image.open(BytesIO(img_data)) if Image else None
                 
                 if img:
