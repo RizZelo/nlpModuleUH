@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FileText, Briefcase, CheckCircle, XCircle, AlertCircle, Upload, Download, Edit3, Lightbulb, X } from 'lucide-react';
+import { FileText, Briefcase, CheckCircle, XCircle, AlertCircle, Upload, Download, Edit3, Lightbulb, X, Loader } from 'lucide-react';
 
 export default function CVAnalyzer() {
   const [cvText, setCvText] = useState('');
@@ -7,6 +7,7 @@ export default function CVAnalyzer() {
   const [jobDesc, setJobDesc] = useState('');
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadingStage, setLoadingStage] = useState('');
   const [editedCvText, setEditedCvText] = useState('');
   const [inlineSuggestions, setInlineSuggestions] = useState([]);
   const [activeSuggestion, setActiveSuggestion] = useState(null);
@@ -22,6 +23,7 @@ export default function CVAnalyzer() {
 
   const handleAnalyze = async () => {
     setLoading(true);
+    setLoadingStage('Uploading CV...');
 
     const formData = new FormData();
     if (cvFile) {
@@ -32,16 +34,22 @@ export default function CVAnalyzer() {
     formData.append("job_description", jobDesc);
 
     try {
+      setLoadingStage('Extracting text and layout...');
+      
       const response = await fetch("http://127.0.0.1:8000/analyze", {
         method: "POST",
         body: formData,
       });
 
+      setLoadingStage('Analyzing with AI...');
       const data = await response.json();
+      
+      setLoadingStage('Preparing suggestions...');
       
       if (data.gemini_analysis?.error) {
         alert("Gemini Error: " + data.gemini_analysis.error);
         setLoading(false);
+        setLoadingStage('');
         return;
       }
 
@@ -104,6 +112,7 @@ export default function CVAnalyzer() {
     }
 
     setLoading(false);
+    setLoadingStage('');
   };
 
   const handleDownload = () => {
@@ -178,6 +187,29 @@ export default function CVAnalyzer() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div className="flex flex-col items-center">
+              <Loader className="w-16 h-16 text-blue-600 animate-spin mb-4" />
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">Analyzing Your CV</h3>
+              <p className="text-gray-600 text-center mb-4">{loadingStage}</p>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                  style={{ 
+                    width: loadingStage.includes('Uploading') ? '25%' : 
+                           loadingStage.includes('Extracting') ? '50%' : 
+                           loadingStage.includes('Analyzing') ? '75%' : '90%' 
+                  }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">CV NLP Analyzer</h1>

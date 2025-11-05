@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from parser import parse_document  # your parser.py file
+from fastapi.responses import JSONResponse
+from parser import parse_document, parse_document_with_images  # your parser.py file
 from gemini_api import analyze_cv_with_gemini  # Gemini integration
 from google import generativeai as genai
 import tempfile
@@ -52,6 +53,7 @@ async def analyze(
     # If a file was uploaded, save it temporarily and parse it
     text = cv_text
     file_info = {}
+    cv_images = []  # Store CV images for visual analysis
     
     if cv_file:
         print(f"📄 File uploaded: {cv_file.filename}")
@@ -70,9 +72,11 @@ async def analyze(
             print(f"💾 Saved to temp file: {tmp_path}")
             print(f"📏 File size: {len(content)} bytes")
             
-            # Parse the document
+            # Parse the document with images for visual analysis
             print("🔄 Parsing document...")
-            text = parse_document(tmp_path)
+            parse_result = parse_document_with_images(tmp_path)
+            text = parse_result['text']
+            cv_images = parse_result['images']
             
             # Clean up temp file
             os.unlink(tmp_path)
@@ -149,7 +153,8 @@ async def analyze(
         print("⚠️  Gemini API key: ", GEMINI_API_KEY)
         
         print("🤖 Analyzing CV with Gemini...")
-        gemini_analysis = analyze_cv_with_gemini(text, job_description, GEMINI_API_KEY)
+        # Pass images if available for visual analysis
+        gemini_analysis = analyze_cv_with_gemini(text, job_description, GEMINI_API_KEY, cv_images)
         
         # Save Gemini analysis to separate file
         if gemini_analysis and 'error' not in gemini_analysis:

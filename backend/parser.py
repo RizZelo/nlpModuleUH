@@ -23,6 +23,44 @@ try:
 except ImportError:
     fitz = None
 
+try:
+    from pdf2image import convert_from_path
+    from PIL import Image
+except ImportError:
+    convert_from_path = None
+    Image = None
+
+
+def parse_document_with_images(file_path: str) -> dict:
+    """
+    Parse a resume/CV file and extract clean text content along with page images.
+    
+    Args:
+        file_path (str): Path to the document file (.pdf, .docx, or .txt)
+    
+    Returns:
+        dict: Dictionary containing 'text' and 'images' keys
+    """
+    result = {
+        'text': None,
+        'images': []
+    }
+    
+    # First get the text
+    text = parse_document(file_path)
+    result['text'] = text
+    
+    # If it's a PDF, also get images
+    _, file_extension = os.path.splitext(file_path)
+    file_extension = file_extension.lower()
+    
+    if file_extension == '.pdf' and text:
+        print("🖼️  Extracting PDF pages as images for visual analysis...")
+        images = pdf_to_images(file_path)
+        result['images'] = images
+    
+    return result
+
 
 def parse_document(file_path: str) -> Optional[str]:
     """
@@ -240,6 +278,56 @@ def extract_text_from_txt(file_path: str) -> Optional[str]:
     except Exception as e:
         print(f"   ❌ Error reading TXT file: {str(e)}")
         return None
+
+
+def pdf_to_images(file_path: str, output_dir: str = None) -> list:
+    """
+    Convert PDF pages to images for vision-based analysis.
+    
+    Args:
+        file_path (str): Path to the PDF file
+        output_dir (str): Directory to save images (optional)
+    
+    Returns:
+        list: List of PIL Image objects or image paths
+    """
+    if not fitz:
+        print("   ⚠️  PyMuPDF not available for PDF to image conversion")
+        return []
+    
+    try:
+        print(f"   Converting PDF to images: {file_path}")
+        images = []
+        
+        with fitz.open(file_path) as doc:
+            for page_num in range(len(doc)):
+                page = doc[page_num]
+                # Render page to pixmap (image)
+                pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))  # 2x zoom for better quality
+                
+                # Convert to PIL Image
+                img_data = pix.tobytes("png")
+                from io import BytesIO
+                img = Image.open(BytesIO(img_data)) if Image else None
+                
+                if img:
+                    if output_dir:
+                        img_path = os.path.join(output_dir, f"page_{page_num + 1}.png")
+                        img.save(img_path)
+                        images.append(img_path)
+                        print(f"   Saved page {page_num + 1} to {img_path}")
+                    else:
+                        images.append(img)
+                        print(f"   Converted page {page_num + 1} to image")
+        
+        print(f"   ✅ Successfully converted {len(images)} pages to images")
+        return images
+    
+    except Exception as e:
+        print(f"   ❌ Error converting PDF to images: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return []
 
 
 def clean_text(text: str) -> str:
