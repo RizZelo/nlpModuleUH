@@ -4,7 +4,7 @@ An intelligent CV analysis tool that uses AI (Google Gemini) to provide detailed
 
 ## Features
 
-- 📄 **Multi-format Support**: Upload CVs in PDF, DOCX, DOC, TXT, ODT, LaTeX, HTML, RTF
+- 📄 **Multi-format Support**: Upload CVs in PDF, DOCX, LaTeX
 - 🤖 **AI-Powered Analysis**: Leverages Google Gemini for comprehensive CV evaluation
 - 📊 **Detailed Scoring**: Overall, formatting, and content scores with explanations
 - 💡 **Inline Suggestions**: Specific, actionable recommendations with text replacement
