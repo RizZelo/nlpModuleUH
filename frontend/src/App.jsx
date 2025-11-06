@@ -78,6 +78,44 @@ export default function EnhancedCVAnalyzer() {
     setError(null);
   };
 
+  // Show loading screen while analyzing
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-8">
+        <div className="max-w-2xl w-full">
+          <div className="bg-white rounded-2xl shadow-2xl p-12 border-2 border-blue-200">
+            {/* Animated Icon */}
+            <div className="flex justify-center mb-8">
+              <div className="relative">
+                <Sparkles className="w-20 h-20 text-blue-600 animate-pulse" />
+                <div className="absolute inset-0 w-20 h-20 bg-blue-400 rounded-full blur-xl opacity-50 animate-ping" />
+              </div>
+            </div>
+
+            {/* Title */}
+            <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
+              Analyzing Your CV
+            </h2>
+            <p className="text-center text-gray-600 mb-8">
+              Our AI is carefully reviewing your resume...
+            </p>
+
+            {/* Progress Bar */}
+            <ProgressBar isActive={loading} />
+
+            {/* Tips Section */}
+            <div className="mt-8 bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+              <p className="text-sm text-blue-800">
+                <strong>💡 Did you know?</strong> We analyze your CV for ATS compatibility, 
+                keyword optimization, and industry best practices.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Show analysis view if analysis exists
   if (analysis) {
     return (
@@ -176,9 +214,6 @@ export default function EnhancedCVAnalyzer() {
             </p>
           ) : null}
         </div>
-
-        {/* Progress Bar */}
-        <ProgressBar isActive={loading} />
       </div>
     </div>
   );

@@ -13,7 +13,10 @@ export default function ProgressBar({ isActive = false, onComplete, completionDe
       return;
     }
 
-    // Simulate progress from 0 to 95% while analyzing
+    // Start with initial progress immediately
+    setProgress(5);
+
+    // Simulate progress from 5 to 95% while analyzing
     const interval = setInterval(() => {
       setProgress((prev) => {
         // Slow down as we approach 95%
@@ -38,7 +41,8 @@ export default function ProgressBar({ isActive = false, onComplete, completionDe
     }
   }, [isActive, progress, onComplete, completionDelay]);
 
-  if (progress === 0 && !isActive) {
+  // Hide the progress bar only when it's not active and has no progress
+  if (!isActive && progress === 0) {
     return null;
   }
 
@@ -50,31 +54,32 @@ export default function ProgressBar({ isActive = false, onComplete, completionDe
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto mt-6">
-      <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-semibold text-gray-700">
-            {progress < 100 ? 'Analyzing CV...' : 'Analysis Complete!'}
-          </span>
-          <span className="text-sm font-bold text-gray-900">{progress}%</span>
+    <div className="w-full">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-lg font-semibold text-gray-700">
+          {progress < 100 ? 'Processing...' : 'Complete!'}
+        </span>
+        <span className="text-2xl font-bold text-blue-600">{progress}%</span>
+      </div>
+      
+      <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden shadow-inner">
+        <div
+          className={`h-6 rounded-full transition-all duration-500 ease-out ${getProgressColor()} relative`}
+          style={{ width: `${progress}%` }}
+        >
+          <div className="h-full w-full bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-shimmer" />
         </div>
-        
-        <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
-          <div
-            className={`h-4 rounded-full transition-all duration-300 ease-out ${getProgressColor()}`}
-            style={{ width: `${progress}%` }}
-          >
-            <div className="h-full w-full bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse" />
-          </div>
-        </div>
-        
-        <div className="mt-3 text-xs text-gray-500 text-center">
-          {progress < 30 && 'Extracting text from document...'}
-          {progress >= 30 && progress < 60 && 'Analyzing CV structure...'}
-          {progress >= 60 && progress < 90 && 'Running AI analysis...'}
-          {progress >= 90 && progress < 100 && 'Finalizing results...'}
-          {progress === 100 && 'Ready!'}
-        </div>
+      </div>
+      
+      <div className="mt-4 text-center">
+        <p className="text-base font-medium text-gray-700">
+          {progress < 30 && '📄 Extracting text from document...'}
+          {progress >= 30 && progress < 60 && '🔍 Analyzing CV structure...'}
+          {progress >= 60 && progress < 90 && '🤖 Running AI analysis...'}
+          {progress >= 90 && progress < 100 && '✨ Finalizing results...'}
+          {progress === 100 && '✅ Analysis Complete!'}
+        </p>
       </div>
     </div>
   );

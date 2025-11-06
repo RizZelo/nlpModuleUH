@@ -27,9 +27,9 @@ wheels/
 .env
 .env.local
 
-# Generated CV and analysis files
-cv_data_*.json
-analysis_*.json
+# Generated CV and analysis files (now stored under data/)
+data/**/*.json
+data/*.json
 
 # Node modules (should not be in backend)
 node_modules/

@@ -1,8 +1,8 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from parser import parse_document, parse_document_with_images  # your parser.py file
-from gemini_api import analyze_cv_with_gemini  # Gemini integration
+from parser import parse_document, parse_document_with_images
+from gemini_api import analyze_cv_with_gemini
 from google import generativeai as genai
 import tempfile
 import os
@@ -11,19 +11,27 @@ import base64
 from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
+
 # Suppress gRPC warnings
 os.environ['GRPC_VERBOSITY'] = 'ERROR'
 os.environ['GLOG_minloglevel'] = '2'
+
+# File storage directories (store JSON files under backend/data/...)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, 'data')
+CV_DATA_DIR = os.path.join(DATA_DIR, 'cv_data')
+ANALYSIS_DIR = os.path.join(DATA_DIR, 'analysis')
+
+# Ensure directories exist
+os.makedirs(CV_DATA_DIR, exist_ok=True)
+os.makedirs(ANALYSIS_DIR, exist_ok=True)
 
 app = FastAPI()
 
 # ⚠️ IMPORTANT: Set your Gemini API key here or use environment variable
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_API_KEY_HERE")
 
-# Choose your Gemini model:
-# - "gemini-2.0-flash-exp" (latest, fastest, recommended)
-# - "gemini-1.5-pro" (best quality, slower)
-# - "gemini-1.5-flash" (good balance)
+# Choose your Gemini model
 GEMINI_MODEL = genai.GenerativeModel(model_name="gemini-2.5-flash")
 
 
@@ -41,11 +49,11 @@ async def analyze(
     cv_file: UploadFile = File(None),
     cv_text: str = Form(None),
     job_description: str = Form(""),
-    use_gemini: bool = Form(True)  # Toggle Gemini analysis
+    use_gemini: bool = Form(True)
 ):
     """
     Handle CV file upload or raw text, save to JSON, and analyze with Gemini.
-    Job description is optional.
+    Returns original file data for editing.
     """
     
     print("\n" + "="*50)
@@ -55,8 +63,8 @@ async def analyze(
     # If a file was uploaded, save it temporarily and parse it
     text = cv_text
     file_info = {}
-    cv_images = []  # Store CV images for visual analysis
-    original_file_data = None  # Store original file for frontend display
+    cv_images = []
+    original_file_data = None
     
     if cv_file:
         print(f"📄 File uploaded: {cv_file.filename}")
@@ -69,11 +77,13 @@ async def analyze(
             # Read file content
             content = await cv_file.read()
             
-            # Store original file data for frontend
+            # Store original file as base64 for frontend download/editing
+            file_base64 = base64.b64encode(content).decode('utf-8')
             original_file_data = {
                 "filename": cv_file.filename,
                 "content_type": cv_file.content_type,
-                "data": base64.b64encode(content).decode('utf-8')
+                "data": file_base64,
+                "size": len(content)
             }
             
             # Save temporarily with proper extension
@@ -145,16 +155,17 @@ async def analyze(
         "file_info": file_info if cv_file else {"source": "raw_text"}
     }
     
-    # Save to JSON file
-    output_filename = f"cv_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-    
+  # Save to JSON file (under data/cv_data)
+    output_basename = f"cv_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    output_filename = os.path.join(CV_DATA_DIR, output_basename)
+
     try:
         with open(output_filename, 'w', encoding='utf-8') as f:
             json.dump(cv_data, f, indent=2, ensure_ascii=False)
-        
+
         print(f"\n💾 Saved CV data to: {output_filename}")
         print("="*50 + "\n")
-        
+
     except Exception as e:
         print(f"❌ Error saving JSON: {str(e)}")
         return {"error": "Failed to save analysis data. Please try again."}
@@ -170,12 +181,11 @@ async def analyze(
         
         # Save Gemini analysis to separate file
         if gemini_analysis and 'error' not in gemini_analysis:
-            analysis_filename = f"analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            analysis_basename = f"analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            analysis_filename = os.path.join(ANALYSIS_DIR, analysis_basename)
             with open(analysis_filename, 'w', encoding='utf-8') as f:
                 json.dump(gemini_analysis, f, indent=2, ensure_ascii=False)
             print(f"💾 Saved Gemini analysis to: {analysis_filename}")
-        else:
-            print("hello");    
     
     # Return response to frontend
     response = {
@@ -187,18 +197,14 @@ async def analyze(
             "word_count": word_count,
             "line_count": line_count,
             "preview": text[:500] + "..." if len(text) > 500 else text,
-            "full_text": text  # ✅ ADD THIS - full extracted text
+            "full_text": text
         },
         "job_description_length": len(job_description),
-        "file_info": file_info if cv_file else {"source": "raw_text"}
+        "file_info": file_info if cv_file else {"source": "raw_text"},
+        "original_file": original_file_data  # ✅ ADD THIS - original file for editing
     }
     
-    # Add original file data if available
-    if original_file_data:
-        response["original_file"] = original_file_data
-    
     # Add Gemini analysis to response if available
-    print(gemini_analysis)
     if gemini_analysis:
         response["gemini_analysis"] = gemini_analysis
     
@@ -219,22 +225,23 @@ async def root():
 async def get_latest_cv():
     """Get the most recently saved CV data"""
     try:
-        # Find all JSON files
-        json_files = [f for f in os.listdir('.') if f.startswith('cv_data_') and f.endswith('.json')]
-        
+        # Find all JSON files in the cv_data folder
+        json_files = [f for f in os.listdir(CV_DATA_DIR) if f.startswith('cv_data_') and f.endswith('.json')]
+
         if not json_files:
             return {"error": "No CV data files found"}
-        
-        # Get the most recent file
-        latest_file = sorted(json_files)[-1]
-        
-        with open(latest_file, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-        
-        return {
-            "filename": latest_file,
-            "data": data
-        }
+
+            # Get the most recent file (sorted by filename timestamp)
+            latest_basename = sorted(json_files)[-1]
+            latest_path = os.path.join(CV_DATA_DIR, latest_basename)
+
+            with open(latest_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+
+            return {
+                "filename": latest_basename,
+                "data": data
+                }
     
     except Exception as e:
         return {"error": f"Failed to read CV data: {str(e)}"}
@@ -244,22 +251,24 @@ async def get_latest_cv():
 async def get_latest_analysis():
     """Get the most recent Gemini analysis"""
     try:
-        # Find all analysis files
-        analysis_files = [f for f in os.listdir('.') if f.startswith('analysis_') and f.endswith('.json')]
-        
+        # Find all analysis files in the analysis folder
+        analysis_files = [f for f in os.listdir(ANALYSIS_DIR) if f.startswith('analysis_') and f.endswith('.json')]
+
         if not analysis_files:
             return {"error": "No analysis files found"}
-        
+
         # Get the most recent file
-        latest_file = sorted(analysis_files)[-1]
-        
-        with open(latest_file, 'r', encoding='utf-8') as f:
+        latest_basename = sorted(analysis_files)[-1]
+        latest_path = os.path.join(ANALYSIS_DIR, latest_basename)
+
+        with open(latest_path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        
+
         return {
-            "filename": latest_file,
+            "filename": latest_basename,
             "analysis": data
         }
+    
     
     except Exception as e:
         return {"error": f"Failed to read analysis: {str(e)}"}
