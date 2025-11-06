@@ -7,6 +7,7 @@ import tempfile
 import os
 import json
 import logging
+import base64
 from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
@@ -63,18 +64,31 @@ async def analyze(
     # If a file was uploaded, save it temporarily and parse it
     text = cv_text
     file_info = {}
+    original_file_data = None
     
     if cv_file:
         logger.info(f"📄 File uploaded: {cv_file.filename}")
         logger.info(f"📄 Content type: {cv_file.content_type}")
         
         try:
+            # Read file content once
+            content = await cv_file.read()
+            
+            # Store original file as base64 for frontend display
+            file_base64 = base64.b64encode(content).decode('utf-8')
+            original_file_data = {
+                "filename": cv_file.filename,
+                "content_type": cv_file.content_type,
+                "data": file_base64,
+                "size_bytes": len(content)
+            }
+            logger.info(f"📦 Encoded original file to base64 ({len(file_base64)} chars)")
+            
             # Get file extension
             _, ext = os.path.splitext(cv_file.filename)
             
-            # Save temporarily with proper extension
+            # Save temporarily with proper extension for parsing
             with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
-                content = await cv_file.read()
                 tmp.write(content)
                 tmp_path = tmp.name
             
@@ -181,11 +195,16 @@ async def analyze(
             "word_count": word_count,
             "line_count": line_count,
             "preview": text[:500] + "..." if len(text) > 500 else text,
-            "full_text": text  # ✅ ADD THIS - full extracted text
+            "full_text": text  # Full extracted text for fallback
         },
         "job_description_length": len(job_description),
         "file_info": file_info if cv_file else {"source": "raw_text"}
     }
+    
+    # Add original file data if available (for frontend display)
+    if original_file_data:
+        response["original_file"] = original_file_data
+        logger.info("✅ Added original file data to response")
     
     # Add Gemini analysis to response if available
     logger.debug(f"Gemini analysis: {gemini_analysis}")

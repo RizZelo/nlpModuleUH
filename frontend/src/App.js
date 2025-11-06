@@ -11,9 +11,8 @@ export default function CVAnalyzer() {
   const [analysis, setAnalysis] = useState(null);
   const [loading, setLoading] = useState(false);
   const [editedCvText, setEditedCvText] = useState('');
+  const [originalFile, setOriginalFile] = useState(null);
   const [inlineSuggestions, setInlineSuggestions] = useState([]);
-  const [activeSuggestion, setActiveSuggestion] = useState(null);
-  const [suggestionPosition, setSuggestionPosition] = useState({ x: 0, y: 0 });
 
   const handleAnalyze = async () => {
     setLoading(true);
@@ -28,6 +27,11 @@ export default function CVAnalyzer() {
       }
 
       const extractedCvText = data.cv_stats?.full_text || cvText;
+      
+      // Store original file data if available
+      if (data.original_file) {
+        setOriginalFile(data.original_file);
+      }
       
       if (cvFile && extractedCvText) {
         setCvText(extractedCvText);
@@ -88,23 +92,14 @@ export default function CVAnalyzer() {
     setLoading(false);
   };
 
-  const applySuggestion = (suggestion) => {
-    if (suggestion.replacement && suggestion.text_snippet) {
-      // Fix for Issue 4.1: Use replaceAll or handle multiple occurrences properly
-      const newText = editedCvText.replace(suggestion.text_snippet, suggestion.replacement);
-      setEditedCvText(newText);
-      setActiveSuggestion(null);
-    }
-  };
-
   const handleReset = () => {
     setAnalysis(null);
     setCvText('');
     setCvFile(null);
     setJobDesc('');
     setEditedCvText('');
+    setOriginalFile(null);
     setInlineSuggestions([]);
-    setActiveSuggestion(null);
   };
 
   return (
@@ -132,13 +127,8 @@ export default function CVAnalyzer() {
           <AnalysisView
             analysis={analysis}
             editedCvText={editedCvText}
-            setEditedCvText={setEditedCvText}
+            originalFile={originalFile}
             inlineSuggestions={inlineSuggestions}
-            activeSuggestion={activeSuggestion}
-            setActiveSuggestion={setActiveSuggestion}
-            suggestionPosition={suggestionPosition}
-            setSuggestionPosition={setSuggestionPosition}
-            applySuggestion={applySuggestion}
           />
         )}
 

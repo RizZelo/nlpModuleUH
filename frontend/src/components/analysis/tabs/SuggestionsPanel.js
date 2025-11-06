@@ -9,8 +9,6 @@ import { getGradeColor } from '../../../utils/scoreUtils';
 const SuggestionsPanel = ({
   analysis,
   inlineSuggestions,
-  setActiveSuggestion,
-  setSuggestionPosition,
 }) => {
   const getFlagIcon = (type) => {
     switch (type) {
@@ -53,11 +51,7 @@ const SuggestionsPanel = ({
             {inlineSuggestions.map((sugg, idx) => (
               <div
                 key={idx}
-                className="p-3 bg-blue-50 border border-blue-200 rounded cursor-pointer hover:bg-blue-100 text-xs"
-                onClick={() => {
-                  setActiveSuggestion(sugg);
-                  setSuggestionPosition({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-                }}
+                className="p-3 bg-blue-50 border border-blue-200 rounded text-xs"
               >
                 <div className="font-semibold text-blue-900 mb-1">
                   {sugg.issue_type}
@@ -68,6 +62,11 @@ const SuggestionsPanel = ({
                 <div className="text-gray-600">
                   💡 {sugg.suggestion}
                 </div>
+                {sugg.replacement && (
+                  <div className="mt-2 text-green-700 font-semibold">
+                    ✓ Suggested: "{sugg.replacement.substring(0, 50)}..."
+                  </div>
+                )}
               </div>
             ))}
           </div>

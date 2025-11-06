@@ -1,5 +1,5 @@
 import React from 'react';
-import CVEditor from './CVEditor';
+import CVViewer from './CVViewer';
 import ScoresCard from './tabs/ScoresCard';
 import SuggestionsPanel from './tabs/SuggestionsPanel';
 
@@ -10,27 +10,16 @@ import SuggestionsPanel from './tabs/SuggestionsPanel';
 const AnalysisView = ({
   analysis,
   editedCvText,
-  setEditedCvText,
+  originalFile,
   inlineSuggestions,
-  activeSuggestion,
-  setActiveSuggestion,
-  suggestionPosition,
-  setSuggestionPosition,
-  applySuggestion,
 }) => {
   return (
     <div className="grid grid-cols-12 gap-6">
-      {/* CV Editor - Middle Column */}
+      {/* CV Viewer - Middle Column */}
       <div className="col-span-7 space-y-4">
-        <CVEditor
+        <CVViewer
+          originalFile={originalFile}
           editedCvText={editedCvText}
-          setEditedCvText={setEditedCvText}
-          inlineSuggestions={inlineSuggestions}
-          activeSuggestion={activeSuggestion}
-          setActiveSuggestion={setActiveSuggestion}
-          suggestionPosition={suggestionPosition}
-          setSuggestionPosition={setSuggestionPosition}
-          applySuggestion={applySuggestion}
         />
       </div>
 
@@ -39,8 +28,6 @@ const AnalysisView = ({
       <SuggestionsPanel
         analysis={analysis}
         inlineSuggestions={inlineSuggestions}
-        setActiveSuggestion={setActiveSuggestion}
-        setSuggestionPosition={setSuggestionPosition}
       />
     </div>
   );
