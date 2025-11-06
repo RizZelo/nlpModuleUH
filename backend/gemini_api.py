@@ -232,11 +232,10 @@ Guidelines:
         
         def is_keyword_in_text(keyword, text):
             """Check if keyword exists as a whole word in text using word boundaries"""
-            import re
             # Escape special regex characters in keyword
             escaped_keyword = re.escape(keyword.lower())
             # Use word boundaries to match whole words only
-            pattern = r'\b' + escaped_keyword + r'\b'
+            pattern = rf'\b{escaped_keyword}\b'
             return bool(re.search(pattern, text.lower()))
         
         # Check keyword_matches - only include if actually in CV

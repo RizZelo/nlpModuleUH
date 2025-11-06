@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 
-export default function ProgressBar({ isActive = false, onComplete }) {
+export default function ProgressBar({ isActive = false, onComplete, completionDelay = 500 }) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -33,10 +33,10 @@ export default function ProgressBar({ isActive = false, onComplete }) {
     if (!isActive && progress > 0 && progress < 100) {
       setProgress(100);
       if (onComplete) {
-        setTimeout(() => onComplete(), 500);
+        setTimeout(() => onComplete(), completionDelay);
       }
     }
-  }, [isActive, progress, onComplete]);
+  }, [isActive, progress, onComplete, completionDelay]);
 
   if (progress === 0 && !isActive) {
     return null;

@@ -18,12 +18,9 @@ export default function CVViewer({ originalFile, cvText }) {
     }
 
     try {
-      // Convert base64 to blob
+      // Convert base64 to blob efficiently
       const binaryString = atob(originalFile.data);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
+      const bytes = Uint8Array.from(binaryString, c => c.charCodeAt(0));
       
       const blob = new Blob([bytes], { type: originalFile.content_type });
       const url = URL.createObjectURL(blob);
