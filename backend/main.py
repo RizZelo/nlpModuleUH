@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from parser import parse_document  # your parser.py file
+from fastapi.responses import JSONResponse
+from parser import parse_document, parse_document_with_images  # your parser.py file
 from gemini_api import analyze_cv_with_gemini  # Gemini integration
 from google import generativeai as genai
 import tempfile
@@ -38,11 +39,12 @@ app.add_middleware(
 async def analyze(
     cv_file: UploadFile = File(None),
     cv_text: str = Form(None),
-    job_description: str = Form(...),
+    job_description: str = Form(""),
     use_gemini: bool = Form(True)  # Toggle Gemini analysis
 ):
     """
-    Handle CV file upload or raw text, save to JSON, and analyze with Gemini
+    Handle CV file upload or raw text, save to JSON, and analyze with Gemini.
+    Job description is optional.
     """
     
     print("\n" + "="*50)
@@ -52,6 +54,7 @@ async def analyze(
     # If a file was uploaded, save it temporarily and parse it
     text = cv_text
     file_info = {}
+    cv_images = []  # Store CV images for visual analysis
     
     if cv_file:
         print(f"📄 File uploaded: {cv_file.filename}")
@@ -70,9 +73,11 @@ async def analyze(
             print(f"💾 Saved to temp file: {tmp_path}")
             print(f"📏 File size: {len(content)} bytes")
             
-            # Parse the document
+            # Parse the document with images for visual analysis
             print("🔄 Parsing document...")
-            text = parse_document(tmp_path)
+            parse_result = parse_document_with_images(tmp_path)
+            text = parse_result['text']
+            cv_images = parse_result['images']
             
             # Clean up temp file
             os.unlink(tmp_path)
@@ -89,13 +94,13 @@ async def analyze(
                 }
             else:
                 print("❌ Parser returned None")
-                return {"error": "Failed to extract text from file"}
+                return {"error": "Failed to extract text from file. Please ensure the file is valid and try again."}
                 
         except Exception as e:
             print(f"❌ Error processing file: {str(e)}")
             import traceback
             traceback.print_exc()
-            return {"error": f"Failed to process file: {str(e)}"}
+            return {"error": "Failed to process file. Please ensure the file is valid and try again."}
     
     elif cv_text:
         print(f"📝 Raw text provided: {len(cv_text)} characters")
@@ -141,15 +146,16 @@ async def analyze(
         
     except Exception as e:
         print(f"❌ Error saving JSON: {str(e)}")
-        return {"error": f"Failed to save JSON: {str(e)}"}
+        return {"error": "Failed to save analysis data. Please try again."}
     
     # Analyze with Gemini if requested
     gemini_analysis = None
     if use_gemini:
-        print("⚠️  Gemini API key: ", GEMINI_API_KEY)
+        print(f"✅ Gemini API key configured (ends with: ...{GEMINI_API_KEY[-4:]})")
         
         print("🤖 Analyzing CV with Gemini...")
-        gemini_analysis = analyze_cv_with_gemini(text, job_description, GEMINI_API_KEY)
+        # Pass images if available for visual analysis
+        gemini_analysis = analyze_cv_with_gemini(text, job_description, GEMINI_API_KEY, cv_images)
         
         # Save Gemini analysis to separate file
         if gemini_analysis and 'error' not in gemini_analysis:
