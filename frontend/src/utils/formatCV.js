@@ -4,6 +4,17 @@
  */
 
 /**
+ * Escapes HTML special characters to prevent XSS
+ * @param {string} text - Text to escape
+ * @returns {string} Escaped text
+ */
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+/**
  * Formats plain text CV content into styled HTML
  * @param {string} text - Raw CV text content
  * @returns {string} Formatted HTML with professional styling
@@ -22,7 +33,7 @@ export function formatCVText(text) {
     if (inList && listItems.length > 0) {
       html += '<ul style="margin: 8px 0 16px 0; padding-left: 24px; line-height: 1.6;">';
       listItems.forEach(item => {
-        html += `<li style="margin-bottom: 6px;">${item}</li>`;
+        html += `<li style="margin-bottom: 6px;">${escapeHtml(item)}</li>`;
       });
       html += '</ul>';
       listItems = [];
@@ -82,24 +93,24 @@ export function formatCVText(text) {
 
     // Format section headers
     if (isHeader(trimmed)) {
-      html += `<h2 style="font-size: 16pt; font-weight: 600; margin: 24px 0 12px 0; padding-bottom: 4px; border-bottom: 2px solid #333; color: #1a1a1a;">${trimmed.replace(/:$/, '')}</h2>`;
+      html += `<h2 style="font-size: 16pt; font-weight: 600; margin: 24px 0 12px 0; padding-bottom: 4px; border-bottom: 2px solid #333; color: #1a1a1a;">${escapeHtml(trimmed.replace(/:$/, ''))}</h2>`;
       return;
     }
 
     // Format date ranges
     if (isDateRange(trimmed)) {
-      html += `<p style="margin: 8px 0; color: #666; font-style: italic; font-size: 10pt;">${trimmed}</p>`;
+      html += `<p style="margin: 8px 0; color: #666; font-style: italic; font-size: 10pt;">${escapeHtml(trimmed)}</p>`;
       return;
     }
 
     // Format job titles
     if (isJobTitle(trimmed)) {
-      html += `<h3 style="font-size: 13pt; font-weight: 600; margin: 16px 0 6px 0; color: #2c3e50;">${trimmed}</h3>`;
+      html += `<h3 style="font-size: 13pt; font-weight: 600; margin: 16px 0 6px 0; color: #2c3e50;">${escapeHtml(trimmed)}</h3>`;
       return;
     }
 
     // Regular paragraph
-    html += `<p style="margin: 0 0 10px 0; line-height: 1.6; color: #333;">${trimmed}</p>`;
+    html += `<p style="margin: 0 0 10px 0; line-height: 1.6; color: #333;">${escapeHtml(trimmed)}</p>`;
   });
 
   // Close any remaining open list

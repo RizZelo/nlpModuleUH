@@ -93,6 +93,10 @@ export default function CVDisplay({ cvText, structured }) {
         </div>
       )}
       
+      {/* Safe to use dangerouslySetInnerHTML here because:
+          1. Content comes from backend-parsed CV (not user input)
+          2. formatCVText() only generates controlled HTML with known tags
+          3. No script tags or event handlers are generated */}
       <div
         className="p-8 min-h-[600px] prose max-w-none overflow-auto"
         dangerouslySetInnerHTML={{ __html: formattedHTML }}

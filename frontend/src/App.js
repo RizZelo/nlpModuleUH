@@ -56,7 +56,6 @@ export default function EnhancedCVAnalyzer() {
         structured: data.cv_stats?.structured || {}
       });
     } catch (err) {
-      console.error('Error:', err);
       setError(err.message || 'Failed to analyze CV. Make sure backend is running on port 8000.');
     } finally {
       setLoading(false);

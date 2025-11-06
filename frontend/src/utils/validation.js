@@ -71,10 +71,10 @@ export function validateTextLength(text, minLength = 0, maxLength = Infinity) {
 export function sanitizeText(text) {
   if (!text) return '';
   
-  // Remove HTML tags and encode special characters
+  // First encode special characters, then remove any remaining HTML tags
   return text
-    .replace(/<[^>]*>/g, '')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
+    .replace(/&lt;[^&]*&gt;/g, '')
     .trim();
 }

@@ -4,13 +4,14 @@ An intelligent CV analysis tool that uses AI (Google Gemini) to provide detailed
 
 ## Features
 
-- 📄 **Multi-format Support**: Upload CVs in PDF, DOCX, or paste text directly
+- 📄 **Multi-format Support**: Upload CVs in PDF, DOCX, DOC, TXT, ODT, LaTeX, HTML, RTF
 - 🤖 **AI-Powered Analysis**: Leverages Google Gemini for comprehensive CV evaluation
 - 📊 **Detailed Scoring**: Overall, formatting, and content scores with explanations
 - 💡 **Inline Suggestions**: Specific, actionable recommendations with text replacement
-- ✏️ **Interactive Editor**: Edit your CV directly with inline suggestion overlays
-- 📥 **Export**: Download your edited CV
+- 👁️ **Professional Display**: Beautifully formatted read-only CV display with Georgia serif font
+- 📥 **Export**: Download your CV as PDF with professional formatting
 - 🎯 **Job-Specific**: Tailored analysis based on target job description
+- 🏗️ **Modular Architecture**: Clean component structure with separation of concerns
 
 ## Project Structure
 
@@ -23,11 +24,19 @@ nlpModuleUH/
 │   └── requirements.txt  # Python dependencies
 └── frontend/             # React frontend
     ├── src/
-    │   ├── components/   # Reusable React components
-    │   ├── services/     # API service layer
-    │   ├── utils/        # Utility functions
-    │   └── config.js     # Configuration
-    └── package.json      # Node dependencies
+    │   ├── components/
+    │   │   ├── upload/           # File upload components
+    │   │   ├── analysis/         # Analysis view components
+    │   │   │   ├── CVDisplay.jsx # Read-only CV display
+    │   │   │   └── tabs/         # Analysis tabs
+    │   │   └── common/           # Reusable UI components
+    │   ├── services/
+    │   │   └── api.js            # API service layer
+    │   ├── utils/
+    │   │   ├── formatCV.js       # CV formatting utility
+    │   │   └── validation.js     # Input validation
+    │   └── App.js                # Main app (174 lines)
+    └── package.json              # Node dependencies
 ```
 
 ## Getting Started
