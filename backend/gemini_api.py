@@ -230,9 +230,18 @@ Guidelines:
         validated_keyword_matches = []
         validated_missing_keywords = []
         
+        def is_keyword_in_text(keyword, text):
+            """Check if keyword exists as a whole word in text using word boundaries"""
+            import re
+            # Escape special regex characters in keyword
+            escaped_keyword = re.escape(keyword.lower())
+            # Use word boundaries to match whole words only
+            pattern = r'\b' + escaped_keyword + r'\b'
+            return bool(re.search(pattern, text.lower()))
+        
         # Check keyword_matches - only include if actually in CV
         for keyword in ats_analysis.get("keyword_matches", []):
-            if keyword.lower() in cv_text_lower:
+            if is_keyword_in_text(keyword, cv_text):
                 validated_keyword_matches.append(keyword)
             else:
                 # If Gemini marked it as matching but it's not in CV, it's actually missing
@@ -240,7 +249,7 @@ Guidelines:
         
         # Check missing_keywords - only include if NOT in CV
         for keyword in ats_analysis.get("missing_keywords", []):
-            if keyword.lower() not in cv_text_lower:
+            if not is_keyword_in_text(keyword, cv_text):
                 validated_missing_keywords.append(keyword)
             else:
                 # If it's actually in the CV, move it to matches

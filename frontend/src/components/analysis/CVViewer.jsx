@@ -148,7 +148,7 @@ export default function CVViewer({ originalFile, cvText }) {
 
       <div className="bg-gray-50 border-t border-gray-200 p-4 text-sm text-gray-600">
         {originalFile 
-          ? `Original file: ${originalFile.filename} (${(originalFile.data?.length * 0.75 / 1024).toFixed(1)} KB)`
+          ? `Original file: ${originalFile.filename}`
           : 'Displaying extracted text content'
         }
       </div>
