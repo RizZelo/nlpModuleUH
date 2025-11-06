@@ -9,6 +9,7 @@ import AnalysisContainer from './components/analysis/AnalysisContainer';
 import Button from './components/common/Button';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import ErrorMessage from './components/common/ErrorMessage';
+import ProgressBar from './components/common/ProgressBar';
 import { analyzeCV, validateCVFile } from './services/api';
 
 export default function EnhancedCVAnalyzer() {
@@ -16,6 +17,7 @@ export default function EnhancedCVAnalyzer() {
   const [jobDesc, setJobDesc] = useState('');
   const [analysis, setAnalysis] = useState(null);
   const [cvText, setCvText] = useState('');
+  const [originalFile, setOriginalFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -49,6 +51,11 @@ export default function EnhancedCVAnalyzer() {
       const extractedText = data.cv_stats?.full_text || '';
       setCvText(extractedText);
 
+      // Store original file data if available
+      if (data.original_file) {
+        setOriginalFile(data.original_file);
+      }
+
       const analysisData = data.gemini_analysis?.analysis || {};
       setAnalysis({
         ...analysisData,
@@ -67,6 +74,7 @@ export default function EnhancedCVAnalyzer() {
     setCvFile(null);
     setJobDesc('');
     setCvText('');
+    setOriginalFile(null);
     setError(null);
   };
 
@@ -77,6 +85,7 @@ export default function EnhancedCVAnalyzer() {
         analysis={analysis} 
         cvFile={cvFile}
         cvText={cvText}
+        originalFile={originalFile}
         onNewAnalysis={handleNewAnalysis}
       />
     );
@@ -167,6 +176,9 @@ export default function EnhancedCVAnalyzer() {
             </p>
           ) : null}
         </div>
+
+        {/* Progress Bar */}
+        <ProgressBar isActive={loading} />
       </div>
     </div>
   );
