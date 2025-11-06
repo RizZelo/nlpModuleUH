@@ -40,7 +40,7 @@ CV Text:
 {cv_text}
 
 {job_context}
-
+    
 Return your response as **valid JSON** with this EXACT structure (no markdown):
 
 {{

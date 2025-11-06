@@ -151,7 +151,7 @@ async def analyze(
     # Analyze with Gemini if requested
     gemini_analysis = None
     if use_gemini:
-        print("⚠️  Gemini API key: ", GEMINI_API_KEY)
+        print(f"✅ Gemini API key configured (ends with: ...{GEMINI_API_KEY[-4:]})")
         
         print("🤖 Analyzing CV with Gemini...")
         # Pass images if available for visual analysis
