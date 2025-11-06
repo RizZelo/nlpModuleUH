@@ -7,6 +7,7 @@ from google import generativeai as genai
 import tempfile
 import os
 import json
+import base64
 from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
@@ -55,6 +56,7 @@ async def analyze(
     text = cv_text
     file_info = {}
     cv_images = []  # Store CV images for visual analysis
+    original_file_data = None  # Store original file for frontend display
     
     if cv_file:
         print(f"📄 File uploaded: {cv_file.filename}")
@@ -64,9 +66,18 @@ async def analyze(
             # Get file extension
             _, ext = os.path.splitext(cv_file.filename)
             
+            # Read file content
+            content = await cv_file.read()
+            
+            # Store original file data for frontend
+            original_file_data = {
+                "filename": cv_file.filename,
+                "content_type": cv_file.content_type,
+                "data": base64.b64encode(content).decode('utf-8')
+            }
+            
             # Save temporarily with proper extension
             with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
-                content = await cv_file.read()
                 tmp.write(content)
                 tmp_path = tmp.name
             
@@ -181,6 +192,10 @@ async def analyze(
         "job_description_length": len(job_description),
         "file_info": file_info if cv_file else {"source": "raw_text"}
     }
+    
+    # Add original file data if available
+    if original_file_data:
+        response["original_file"] = original_file_data
     
     # Add Gemini analysis to response if available
     print(gemini_analysis)

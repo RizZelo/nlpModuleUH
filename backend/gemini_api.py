@@ -225,6 +225,39 @@ Guidelines:
         # Convert Gemini structure → frontend-compatible structure
         ats_analysis = parsed.get("ats_analysis", {})
         
+        # Validate keyword matches - ensure keywords are actually present in CV text
+        cv_text_lower = cv_text.lower()
+        validated_keyword_matches = []
+        validated_missing_keywords = []
+        
+        def is_keyword_in_text(keyword, text):
+            """Check if keyword exists as a whole word in text using word boundaries"""
+            # Escape special regex characters in keyword
+            escaped_keyword = re.escape(keyword.lower())
+            # Use word boundaries to match whole words only
+            pattern = rf'\b{escaped_keyword}\b'
+            return bool(re.search(pattern, text.lower()))
+        
+        # Check keyword_matches - only include if actually in CV
+        for keyword in ats_analysis.get("keyword_matches", []):
+            if is_keyword_in_text(keyword, cv_text):
+                validated_keyword_matches.append(keyword)
+            else:
+                # If Gemini marked it as matching but it's not in CV, it's actually missing
+                validated_missing_keywords.append(keyword)
+        
+        # Check missing_keywords - only include if NOT in CV
+        for keyword in ats_analysis.get("missing_keywords", []):
+            if not is_keyword_in_text(keyword, cv_text):
+                validated_missing_keywords.append(keyword)
+            else:
+                # If it's actually in the CV, move it to matches
+                validated_keyword_matches.append(keyword)
+        
+        # Remove duplicates
+        validated_keyword_matches = list(set(validated_keyword_matches))
+        validated_missing_keywords = list(set(validated_missing_keywords))
+        
         analysis_result = {
             'status': 'success',
             'analysis': {
@@ -240,8 +273,8 @@ Guidelines:
                 'grammar_and_clarity': {"issues": parsed["formatting"]["issues"]},
                 'job_match_analysis': {
                     "relevance_score": ats_analysis.get("relevance_score", parsed["content"]["score"] * 10),
-                    "keyword_matches": ats_analysis.get("keyword_matches", []),
-                    "missing_keywords": ats_analysis.get("missing_keywords", []),
+                    "keyword_matches": validated_keyword_matches,
+                    "missing_keywords": validated_missing_keywords,
                     "recommendations": ats_analysis.get("recommendations", [])
                 },
                 'global_analysis': {

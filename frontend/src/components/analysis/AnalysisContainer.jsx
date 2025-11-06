@@ -8,11 +8,11 @@ import {
   FileText, TrendingUp, Zap, Clock, AlertCircle, 
   CheckCircle, XCircle 
 } from 'lucide-react';
-import CVDisplay from './CVDisplay';
+import CVViewer from './CVViewer';
 import AnalysisTab from './tabs/AnalysisTab';
 import StatisticsTab from './tabs/StatisticsTab';
 
-export default function AnalysisContainer({ analysis, cvFile, cvText, onNewAnalysis }) {
+export default function AnalysisContainer({ analysis, cvFile, cvText, originalFile, onNewAnalysis }) {
   const [activeTab, setActiveTab] = useState('overview');
   
   const inlineSuggestions = analysis.inline_suggestions || [];
@@ -120,7 +120,7 @@ export default function AnalysisContainer({ analysis, cvFile, cvText, onNewAnaly
             {activeTab === 'overview' && <AnalysisTab analysis={analysis} />}
             
             {activeTab === 'cv-display' && (
-              <CVDisplay cvText={cvText} structured={analysis.structured} />
+              <CVViewer originalFile={originalFile} cvText={cvText} />
             )}
 
             {activeTab === 'suggestions' && (
