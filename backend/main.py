@@ -272,7 +272,8 @@ async def get_latest_analysis():
         }
     
     except Exception as e:
-        return {"error": f"Failed to read analysis: {str(e)}"}
+        print(f"❌ Error reading analysis: {str(e)}")
+        return {"error": "Failed to read analysis. Please try again."}
 
 
 @app.post("/analyze-structured")
@@ -334,7 +335,9 @@ async def analyze_structured(
             
         except Exception as e:
             print(f"❌ Error processing file: {str(e)}")
-            return {"error": f"Failed to process file: {str(e)}"}
+            import traceback
+            traceback.print_exc()
+            return {"error": "Failed to process file. Please ensure the file is valid and try again."}
     
     if not text:
         return {"error": "No CV text provided"}
@@ -344,7 +347,8 @@ async def analyze_structured(
     structured_result = parse_cv_to_structured_data(text, GEMINI_API_KEY)
     
     if structured_result['status'] != 'success':
-        return {"error": "Failed to parse CV structure", "details": structured_result}
+        print(f"❌ Failed to parse CV structure: {structured_result}")
+        return {"error": "Failed to parse CV structure. Please try again or use a different format."}
     
     structured_cv = structured_result['structured_data']
     
@@ -431,9 +435,11 @@ async def apply_suggestion(
     
     except Exception as e:
         print(f"❌ Error applying suggestion: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return {
             "status": "error",
-            "message": f"Failed to apply suggestion: {str(e)}"
+            "message": "Failed to apply suggestion. Please try again."
         }
 
 
@@ -458,6 +464,5 @@ async def get_latest_structured_cv():
         }
     
     except Exception as e:
-        return {"error": f"Failed to read structured CV: {str(e)}"}
-    except Exception as e:
-        return {"error": f"Failed to read analysis: {str(e)}"}
+        print(f"❌ Error reading structured CV: {str(e)}")
+        return {"error": "Failed to read structured CV. Please try again."}
