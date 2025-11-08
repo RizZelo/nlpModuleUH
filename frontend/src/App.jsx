@@ -10,12 +10,13 @@ import Button from './components/common/Button';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import ErrorMessage from './components/common/ErrorMessage';
 import ProgressBar from './components/common/ProgressBar';
-import { analyzeCV, validateCVFile } from './services/api';
+import { analyzeStructuredCV, validateCVFile, applySuggestion } from './services/api';
 
 export default function EnhancedCVAnalyzer() {
   const [cvFile, setCvFile] = useState(null);
   const [jobDesc, setJobDesc] = useState('');
   const [analysis, setAnalysis] = useState(null);
+  const [structuredCV, setStructuredCV] = useState(null);
   const [cvText, setCvText] = useState('');
   const [originalFile, setOriginalFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -45,10 +46,13 @@ export default function EnhancedCVAnalyzer() {
     setError(null);
 
     try {
-      const data = await analyzeCV(cvFile, jobDesc);
+      const data = await analyzeStructuredCV(cvFile, jobDesc);
       
-      // Extract CV text and analysis
-      const extractedText = data.cv_stats?.full_text || '';
+      // Store structured CV data
+      setStructuredCV(data.structured_cv || {});
+      
+      // Keep original text for backward compatibility
+      const extractedText = data.structured_cv?.original_text || '';
       setCvText(extractedText);
 
       // Store original file data if available
@@ -59,8 +63,8 @@ export default function EnhancedCVAnalyzer() {
       const analysisData = data.gemini_analysis?.analysis || {};
       setAnalysis({
         ...analysisData,
-        metadata: data.cv_stats?.metadata || {},
-        structured: data.cv_stats?.structured || {}
+        metadata: data.file_info || {},
+        structured: data.structured_cv || {}
       });
     } catch (err) {
       setError(err.message || 'Failed to analyze CV. Make sure backend is running on port 8000.');
@@ -69,8 +73,34 @@ export default function EnhancedCVAnalyzer() {
     }
   };
 
+  const handleApplySuggestion = async (suggestion) => {
+    if (!structuredCV) {
+      console.error('No structured CV data available');
+      return;
+    }
+
+    try {
+      const result = await applySuggestion(structuredCV, suggestion);
+      
+      // Update the structured CV with the applied suggestion
+      setStructuredCV(result.updated_cv);
+      
+      // Update analysis to reflect the change
+      setAnalysis(prev => ({
+        ...prev,
+        structured: result.updated_cv
+      }));
+      
+      return result.updated_cv;
+    } catch (err) {
+      console.error('Failed to apply suggestion:', err);
+      throw err;
+    }
+  };
+
   const handleNewAnalysis = () => {
     setAnalysis(null);
+    setStructuredCV(null);
     setCvFile(null);
     setJobDesc('');
     setCvText('');
@@ -123,8 +153,10 @@ export default function EnhancedCVAnalyzer() {
         analysis={analysis} 
         cvFile={cvFile}
         cvText={cvText}
+        structuredCV={structuredCV}
         originalFile={originalFile}
         onNewAnalysis={handleNewAnalysis}
+        onApplySuggestion={handleApplySuggestion}
       />
     );
   }

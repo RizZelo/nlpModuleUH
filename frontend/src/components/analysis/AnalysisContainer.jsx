@@ -6,16 +6,26 @@ import React, { useState } from 'react';
 import { 
   Sparkles, Target, Edit3, Lightbulb, 
   FileText, TrendingUp, Zap, Clock, AlertCircle, 
-  CheckCircle, XCircle 
+  CheckCircle, XCircle, Layers
 } from 'lucide-react';
 import CVViewer from './CVViewer';
 import AnalysisTab from './tabs/AnalysisTab';
 import StatisticsTab from './tabs/StatisticsTab';
+import FieldSuggestions from './FieldSuggestions';
 
-export default function AnalysisContainer({ analysis, cvFile, cvText, originalFile, onNewAnalysis }) {
+export default function AnalysisContainer({ 
+  analysis, 
+  cvFile, 
+  cvText, 
+  structuredCV, 
+  originalFile, 
+  onNewAnalysis, 
+  onApplySuggestion 
+}) {
   const [activeTab, setActiveTab] = useState('overview');
   
   const inlineSuggestions = analysis.inline_suggestions || [];
+  const fieldSuggestions = analysis.field_suggestions || [];
   const quickWins = analysis.quick_wins || [];
   const sectionAnalysis = analysis.section_analysis || [];
   const jobMatch = analysis.job_match_analysis || {};
@@ -86,6 +96,7 @@ export default function AnalysisContainer({ analysis, cvFile, cvText, originalFi
                 {[
                   { id: 'overview', icon: Target, label: 'Overview' },
                   { id: 'cv-display', icon: Edit3, label: 'View CV' },
+                  { id: 'field-suggestions', icon: Layers, label: 'Apply Changes', count: fieldSuggestions.length },
                   { id: 'suggestions', icon: Lightbulb, label: 'Suggestions', count: inlineSuggestions.length },
                   { id: 'sections', icon: FileText, label: 'Sections', count: sectionAnalysis.length },
                   { id: 'ats', icon: TrendingUp, label: 'ATS Match' },
@@ -121,6 +132,27 @@ export default function AnalysisContainer({ analysis, cvFile, cvText, originalFi
             
             {activeTab === 'cv-display' && (
               <CVViewer originalFile={originalFile} cvText={cvText} />
+            )}
+
+            {activeTab === 'field-suggestions' && (
+              <div>
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
+                  <div className="flex items-start gap-3">
+                    <Layers className="w-8 h-8 text-blue-600 flex-shrink-0" />
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">Field-Targeted Improvements</h3>
+                      <p className="text-sm text-gray-700">
+                        These suggestions target specific fields in your CV structure. Click "Apply" to automatically 
+                        update the field with the improved text. Each change is made directly to your structured CV data.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <FieldSuggestions 
+                  suggestions={fieldSuggestions} 
+                  onApplySuggestion={onApplySuggestion}
+                />
+              </div>
             )}
 
             {activeTab === 'suggestions' && (
