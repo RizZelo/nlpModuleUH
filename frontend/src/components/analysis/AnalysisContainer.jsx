@@ -6,12 +6,13 @@ import React, { useState } from 'react';
 import { 
   Sparkles, Target, Edit3, Lightbulb, 
   FileText, TrendingUp, Zap, Clock, AlertCircle, 
-  CheckCircle, XCircle, Layers
+  CheckCircle, XCircle, Layers, Database
 } from 'lucide-react';
 import CVViewer from './CVViewer';
 import AnalysisTab from './tabs/AnalysisTab';
 import StatisticsTab from './tabs/StatisticsTab';
 import FieldSuggestions from './FieldSuggestions';
+import StructuredCVDisplay from './StructuredCVDisplay';
 
 export default function AnalysisContainer({ 
   analysis, 
@@ -95,6 +96,7 @@ export default function AnalysisContainer({
               <nav className="space-y-2">
                 {[
                   { id: 'overview', icon: Target, label: 'Overview' },
+                  { id: 'structured-cv', icon: Database, label: 'Structured CV' },
                   { id: 'cv-display', icon: Edit3, label: 'View CV' },
                   { id: 'field-suggestions', icon: Layers, label: 'Apply Changes', count: fieldSuggestions.length },
                   { id: 'suggestions', icon: Lightbulb, label: 'Suggestions', count: inlineSuggestions.length },
@@ -129,6 +131,24 @@ export default function AnalysisContainer({
           {/* Main Content */}
           <div className="col-span-7">
             {activeTab === 'overview' && <AnalysisTab analysis={analysis} />}
+            
+            {activeTab === 'structured-cv' && (
+              <div>
+                <div className="bg-gradient-to-r from-green-50 to-teal-50 border-2 border-green-300 rounded-lg p-6 mb-6">
+                  <div className="flex items-start gap-3">
+                    <Database className="w-8 h-8 text-green-600 flex-shrink-0" />
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">Structured CV Data</h3>
+                      <p className="text-sm text-gray-700">
+                        Your CV has been parsed into structured fields. This enables precise, field-level improvements 
+                        and better tracking of your CV content.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <StructuredCVDisplay structuredCV={structuredCV} />
+              </div>
+            )}
             
             {activeTab === 'cv-display' && (
               <CVViewer originalFile={originalFile} cvText={cvText} />

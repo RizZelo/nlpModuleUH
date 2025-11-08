@@ -4,14 +4,12 @@ An intelligent CV analysis tool that uses AI (Google Gemini) to provide detailed
 
 ## Features
 
-<<<<<<< HEAD
-- 📄 **Multi-format Support**: Upload CVs in PDF, DOCX, LaTeX 
-=======
 - 📄 **Multi-format Support**: Upload CVs in PDF, DOCX, LaTeX
->>>>>>> 155120539350e330af10daebbe9f6be23a131197
 - 🤖 **AI-Powered Analysis**: Leverages Google Gemini for comprehensive CV evaluation
 - 📊 **Detailed Scoring**: Overall, formatting, and content scores with explanations
 - 💡 **Inline Suggestions**: Specific, actionable recommendations with text replacement
+- 🎯 **Structured CV Data**: Parse CV into structured fields (summary, experience, skills, etc.)
+- ✨ **Field-Targeted Improvements**: Apply suggestions directly to specific CV fields with one click
 - 👁️ **Professional Display**: Beautifully formatted read-only CV display with Georgia serif font
 - 📥 **Export**: Download your CV as PDF with professional formatting
 - 🎯 **Job-Specific**: Tailored analysis based on target job description
@@ -21,26 +19,31 @@ An intelligent CV analysis tool that uses AI (Google Gemini) to provide detailed
 
 ```
 nlpModuleUH/
-├── backend/               # FastAPI backend
-│   ├── main.py           # Main API endpoints
-│   ├── parser.py         # CV parsing (PDF, DOCX, TXT)
-│   ├── gemini_api.py     # Gemini AI integration
-│   └── requirements.txt  # Python dependencies
-└── frontend/             # React frontend
+├── backend/                      # FastAPI backend
+│   ├── main.py                  # Main API endpoints
+│   ├── parser.py                # CV parsing (PDF, DOCX, TXT)
+│   ├── gemini_api.py            # Gemini AI integration (original)
+│   ├── gemini_api_structured.py # Enhanced Gemini AI for structured CV
+│   ├── cv_structure_parser.py   # CV structure parser
+│   ├── test_cv_structure.py     # Tests for structured CV
+│   └── requirements.txt         # Python dependencies
+└── frontend/                    # React frontend
     ├── src/
     │   ├── components/
-    │   │   ├── upload/           # File upload components
-    │   │   ├── analysis/         # Analysis view components
-    │   │   │   ├── CVDisplay.jsx # Read-only CV display
-    │   │   │   └── tabs/         # Analysis tabs
-    │   │   └── common/           # Reusable UI components
+    │   │   ├── upload/                    # File upload components
+    │   │   ├── analysis/                  # Analysis view components
+    │   │   │   ├── CVDisplay.jsx         # Read-only CV display
+    │   │   │   ├── FieldSuggestions.jsx  # Field-targeted suggestions
+    │   │   │   ├── StructuredCVDisplay.jsx # Structured CV viewer
+    │   │   │   └── tabs/                 # Analysis tabs
+    │   │   └── common/                   # Reusable UI components
     │   ├── services/
-    │   │   └── api.js            # API service layer
+    │   │   └── api.js                    # API service layer
     │   ├── utils/
-    │   │   ├── formatCV.js       # CV formatting utility
-    │   │   └── validation.js     # Input validation
-    │   └── App.js                # Main app (174 lines)
-    └── package.json              # Node dependencies
+    │   │   ├── formatCV.js               # CV formatting utility
+    │   │   └── validation.js             # Input validation
+    │   └── App.js                        # Main app
+    └── package.json                      # Node dependencies
 ```
 
 ## Getting Started
@@ -115,6 +118,74 @@ The application will open at `http://localhost:3000`
 6. **Apply Suggestions**: Click highlighted text to see and apply specific suggestions
 7. **Download**: Export your improved CV
 
+## Structured CV Data (New Feature!)
+
+The application now supports **structured CV data** parsing, which provides more powerful and precise improvements:
+
+### What is Structured CV Data?
+
+Instead of treating your CV as plain text, the system now parses it into structured fields:
+
+```javascript
+{
+  summary: "Experienced developer with...",
+  contact: {
+    name: "John Doe",
+    email: "john@example.com",
+    phone: "123-456-7890"
+  },
+  experience: [
+    {
+      id: "exp_1",
+      title: "Software Engineer",
+      company: "Tech Corp",
+      description: "Led development of...",
+      bullets: ["Achievement 1", "Achievement 2"]
+    }
+  ],
+  education: [...],
+  skills: {
+    technical: ["Python", "React", "AWS"],
+    languages: ["English", "Spanish"]
+  },
+  projects: [...],
+  certifications: [...]
+}
+```
+
+### Benefits
+
+1. **Field-Targeted Suggestions**: Each suggestion targets a specific field in your CV
+2. **One-Click Application**: Click "Apply" to automatically update that field
+3. **Better Tracking**: See exactly which parts of your CV have been improved
+4. **Precise Changes**: No manual copy-pasting or searching for text
+5. **Structured View**: View your CV as organized, structured data
+
+### How to Use
+
+1. Upload your CV as usual
+2. Navigate to the **"Structured CV"** tab to see your parsed CV structure
+3. Go to **"Apply Changes"** tab to see field-targeted suggestions
+4. Click **"Apply"** on any suggestion to automatically update that field
+5. Changes are applied directly to the structured CV data
+
+### Example Suggestion
+
+```javascript
+{
+  suggestionId: 1,
+  targetField: "experience",
+  fieldPath: ["experience", 0, "description"],
+  fieldId: "exp_1",
+  originalValue: "Worked on projects",
+  improvedValue: "Led development of scalable microservices architecture serving 1M+ users",
+  problem: "Too vague and lacks quantifiable impact",
+  explanation: "Specific achievements with metrics are more compelling"
+}
+```
+
+When you click "Apply", the system updates `experience[0].description` with the improved value.
+
 ## API Documentation
 
 Once the backend is running, visit `http://localhost:8000/docs` for interactive API documentation.
@@ -122,8 +193,11 @@ Once the backend is running, visit `http://localhost:8000/docs` for interactive 
 ### Key Endpoints
 
 - `GET /` - Health check
-- `POST /analyze` - Analyze CV against job description
+- `POST /analyze` - Analyze CV against job description (original)
+- `POST /analyze-structured` - Analyze CV with structured data (new!)
+- `POST /apply-suggestion` - Apply a field-targeted suggestion (new!)
 - `GET /latest-cv` - Get most recent CV data
+- `GET /latest-structured-cv` - Get most recent structured CV (new!)
 - `GET /latest-analysis` - Get most recent analysis
 
 ## Configuration
