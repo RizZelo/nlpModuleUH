@@ -3,6 +3,8 @@
 ## Overview
 This document illustrates the architecture transformation from a monolithic prototype to a modular, production-ready application.
 
+Note (Nov 2025): The current system uses Google Gemini for structured parsing and analysis. Migration to a local Ollama LLM is planned but not yet implemented.
+
 ## Frontend Architecture Evolution
 
 ### Before: Monolithic Component
@@ -126,6 +128,12 @@ src/
     ├── MAX_FILE_SIZE_MB
     ├── ACCEPTED_FILE_TYPES
     └── UI configuration
+
+Key production components (current):
+- `analysis/AnalysisContainer.jsx` — coordinates tabs: CV Preview, Structured CV, Apply Changes
+- `analysis/CVDisplay.jsx` — read-only CV preview and PDF export
+- `analysis/StructuredCVDisplay.jsx` — defensive rendering of structured CV, dynamic sections and skills
+- `analysis/FieldSuggestions.jsx` — Apply/Undo with language preservation
 ```
 
 ## Backend Architecture
@@ -139,7 +147,7 @@ backend/
 │   │
 │   ├── Endpoints:
 │   │   ├── GET  / (health check)
-│   │   ├── POST /analyze (main analysis)
+│   │   ├── POST /analyze-structured (main analysis)
 │   │   ├── GET  /latest-cv
 │   │   └── GET  /latest-analysis
 │   │

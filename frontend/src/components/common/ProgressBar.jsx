@@ -75,9 +75,9 @@ export default function ProgressBar({ isActive = false, onComplete, completionDe
       <div className="mt-4 text-center">
         <p className="text-base font-medium text-gray-700">
           {progress < 30 && '📄 Extracting text from document...'}
-          {progress >= 30 && progress < 60 && '🔍 Analyzing CV structure...'}
-          {progress >= 60 && progress < 90 && '🤖 Running AI analysis...'}
-          {progress >= 90 && progress < 100 && '✨ Finalizing results...'}
+          {progress >= 30 && progress < 60 && ' Analyzing CV structure...'}
+          {progress >= 60 && progress < 90 && ' Running AI analysis...'}
+          {progress >= 90 && progress < 100 && ' Finalizing results...'}
           {progress === 100 && '✅ Analysis Complete!'}
         </p>
       </div>

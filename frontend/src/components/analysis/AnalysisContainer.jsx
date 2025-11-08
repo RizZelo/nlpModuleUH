@@ -4,18 +4,29 @@
  */
 import React, { useState } from 'react';
 import { 
-  Sparkles, Target, Edit3, Lightbulb, 
+  Sparkles, Target, Edit3,
   FileText, TrendingUp, Zap, Clock, AlertCircle, 
-  CheckCircle, XCircle 
+  CheckCircle, XCircle, Layers, Database, Download
 } from 'lucide-react';
 import CVViewer from './CVViewer';
 import AnalysisTab from './tabs/AnalysisTab';
 import StatisticsTab from './tabs/StatisticsTab';
+import FieldSuggestions from './FieldSuggestions';
+import StructuredCVDisplay from './StructuredCVDisplay';
+import { exportStructuredCVToPdf } from '../../utils/exportPdf';
 
-export default function AnalysisContainer({ analysis, cvFile, cvText, originalFile, onNewAnalysis }) {
+export default function AnalysisContainer({ 
+  analysis, 
+  cvFile, 
+  cvText, 
+  structuredCV, 
+  originalFile, 
+  onNewAnalysis, 
+  onApplySuggestion 
+}) {
   const [activeTab, setActiveTab] = useState('overview');
   
-  const inlineSuggestions = analysis.inline_suggestions || [];
+  const fieldSuggestions = analysis.field_suggestions || [];
   const quickWins = analysis.quick_wins || [];
   const sectionAnalysis = analysis.section_analysis || [];
   const jobMatch = analysis.job_match_analysis || {};
@@ -27,15 +38,7 @@ export default function AnalysisContainer({ analysis, cvFile, cvText, originalFi
     return 'text-red-600';
   };
 
-  const getSeverityBadge = (severity) => {
-    const colors = {
-      critical: 'bg-red-100 text-red-800 border-red-300',
-      high: 'bg-orange-100 text-orange-800 border-orange-300',
-      medium: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-      low: 'bg-blue-100 text-blue-800 border-blue-300'
-    };
-    return colors[severity] || colors.medium;
-  };
+  // (Inline suggestions removed)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -83,10 +86,11 @@ export default function AnalysisContainer({ analysis, cvFile, cvText, originalFi
           <div className="col-span-2">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sticky top-24">
               <nav className="space-y-2">
-                {[
+                {[ 
                   { id: 'overview', icon: Target, label: 'Overview' },
+                  { id: 'structured-cv', icon: Database, label: 'Structured CV' },
                   { id: 'cv-display', icon: Edit3, label: 'View CV' },
-                  { id: 'suggestions', icon: Lightbulb, label: 'Suggestions', count: inlineSuggestions.length },
+                  { id: 'field-suggestions', icon: Layers, label: 'Apply Changes', count: fieldSuggestions.length },
                   { id: 'sections', icon: FileText, label: 'Sections', count: sectionAnalysis.length },
                   { id: 'ats', icon: TrendingUp, label: 'ATS Match' },
                   { id: 'quick-wins', icon: Zap, label: 'Quick Wins', count: quickWins.length }
@@ -119,64 +123,57 @@ export default function AnalysisContainer({ analysis, cvFile, cvText, originalFi
           <div className="col-span-7">
             {activeTab === 'overview' && <AnalysisTab analysis={analysis} />}
             
+            {activeTab === 'structured-cv' && (
+              <div>
+                <div className="bg-gradient-to-r from-green-50 to-teal-50 border-2 border-green-300 rounded-lg p-6 mb-6">
+                  <div className="flex items-start gap-3">
+                    <Database className="w-8 h-8 text-green-600 flex-shrink-0" />
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">Structured CV Data</h3>
+                      <p className="text-sm text-gray-700">
+                        Your CV has been parsed into structured fields. This enables precise, field-level improvements 
+                        and better tracking of your CV content.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => exportStructuredCVToPdf(structuredCV)}
+                      className="ml-auto inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
+                    >
+                      <Download className="w-4 h-4" />
+                      Export PDF
+                    </button>
+                  </div>
+                </div>
+                <StructuredCVDisplay structuredCV={structuredCV} />
+              </div>
+            )}
+            
             {activeTab === 'cv-display' && (
               <CVViewer originalFile={originalFile} cvText={cvText} />
             )}
 
-            {activeTab === 'suggestions' && (
-              <div className="space-y-4">
-                {inlineSuggestions.map((sugg, idx) => (
-                  <div key={idx} className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getSeverityBadge(sugg.severity)}`}>
-                          {sugg.severity?.toUpperCase()}
-                        </span>
-                        <span className="text-xs text-gray-600 font-medium">{sugg.issue_type}</span>
-                        {sugg.section && (
-                          <span className="text-xs text-gray-500">• {sugg.section}</span>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="bg-red-50 border border-red-200 rounded p-3">
-                        <div className="text-xs font-semibold text-red-800 mb-1">Original:</div>
-                        <div className="text-sm text-gray-800 italic">"{sugg.text_snippet}"</div>
-                      </div>
-                      
-                      <div className="text-sm text-gray-700">
-                        <strong>Problem:</strong> {sugg.problem}
-                      </div>
-                      
-                      <div className="text-sm text-blue-700">
-                        <strong>Suggestion:</strong> {sugg.suggestion}
-                      </div>
-                      
-                      {sugg.replacement && (
-                        <div className="bg-green-50 border border-green-200 rounded p-3">
-                          <div className="text-xs font-semibold text-green-800 mb-1">Improved:</div>
-                          <div className="text-sm text-gray-800 font-medium">"{sugg.replacement}"</div>
-                        </div>
-                      )}
-                      
-                      {sugg.explanation && (
-                        <div className="text-xs text-gray-600 italic border-l-2 border-gray-300 pl-3">
-                          {sugg.explanation}
-                        </div>
-                      )}
+            {activeTab === 'field-suggestions' && (
+              <div>
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
+                  <div className="flex items-start gap-3">
+                    <Layers className="w-8 h-8 text-blue-600 flex-shrink-0" />
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">Field-Targeted Improvements</h3>
+                      <p className="text-sm text-gray-700">
+                        These suggestions target specific fields in your CV structure. Click "Apply" to automatically 
+                        update the field with the improved text. Each change is made directly to your structured CV data.
+                      </p>
                     </div>
                   </div>
-                ))}
-                
-                {inlineSuggestions.length === 0 && (
-                  <div className="text-center py-12 text-gray-500">
-                    <Lightbulb className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                    <p>No suggestions available</p>
-                  </div>
-                )}
+                </div>
+                <FieldSuggestions 
+                  suggestions={fieldSuggestions} 
+                  onApplySuggestion={onApplySuggestion}
+                />
               </div>
             )}
+
+            {/* Inline suggestions tab removed as requested */}
 
             {activeTab === 'quick-wins' && (
               <div className="space-y-4">
