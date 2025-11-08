@@ -4,10 +4,9 @@
  */
 import React from 'react';
 import { formatCVText } from '../../utils/formatCV';
-import { Download, Eye, EyeOff } from 'lucide-react';
+import { Download, Eye } from 'lucide-react';
 
 export default function CVDisplay({ cvText, structured }) {
-  const [showStructure, setShowStructure] = React.useState(false);
   const formattedHTML = formatCVText(cvText);
 
   const handleDownloadPDF = () => {
@@ -56,14 +55,7 @@ export default function CVDisplay({ cvText, structured }) {
           <Eye className="w-5 h-5 text-blue-600" />
           CV Preview
         </h2>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setShowStructure(!showStructure)}
-            className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1 px-3 py-1 rounded border border-blue-300"
-          >
-            {showStructure ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            {showStructure ? 'Hide' : 'Show'} Structure
-          </button>
+          <div className="flex gap-2">
           <button
             onClick={handleDownloadPDF}
             className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-medium flex items-center gap-1 text-sm"
@@ -73,25 +65,6 @@ export default function CVDisplay({ cvText, structured }) {
           </button>
         </div>
       </div>
-      
-      {showStructure && structured && (
-        <div className="bg-blue-50 border-b border-blue-200 p-4 text-sm">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <strong>Sections:</strong> {structured.sections?.length || 0}
-            </div>
-            <div>
-              <strong>Bullet Points:</strong> {structured.bullet_points?.length || 0}
-            </div>
-            <div>
-              <strong>Contacts:</strong> {Object.keys(structured.contacts || {}).join(', ') || 'None'}
-            </div>
-            <div>
-              <strong>Dates:</strong> {structured.dates?.length || 0}
-            </div>
-          </div>
-        </div>
-      )}
       
       {/* Safe to use dangerouslySetInnerHTML here because:
           1. Content comes from backend-parsed CV (not user input)

@@ -3,11 +3,13 @@
  * Displays field-targeted suggestions with Apply buttons for structured CV
  */
 import React, { useState } from 'react';
-import { CheckCircle, AlertCircle, Target, Check } from 'lucide-react';
+import { CheckCircle, AlertCircle, Target, Check, Undo2 } from 'lucide-react';
 
 export default function FieldSuggestions({ suggestions, onApplySuggestion }) {
   const [appliedSuggestions, setAppliedSuggestions] = useState(new Set());
   const [applyingId, setApplyingId] = useState(null);
+  const [revertingId, setRevertingId] = useState(null);
+  const [prevValues, setPrevValues] = useState({}); // suggestionId -> previous value for undo
 
   const getSeverityBadge = (severity) => {
     const colors = {
@@ -39,10 +41,36 @@ export default function FieldSuggestions({ suggestions, onApplySuggestion }) {
     return parts.join(' → ');
   };
 
+  // Tiny language detector: fr/ar/en heuristics (kept for validation)
+  const detectLanguage = (text = '') => {
+    if (!text) return 'unknown';
+    // Arabic script range
+    if (/[\u0600-\u06FF]/.test(text)) return 'ar';
+    // French indicators: accents and common words
+    const frenchAccents = /[àâäéèêëîïôöùûüçœÀÂÄÉÈÊËÎÏÔÖÙÛÜÇŒ]/;
+    const frenchWords = /( le | la | les | des | et | pour | avec | Présent|Septembre|Juin|Août|Mars|Février|École|Ingénieur)/i;
+    if (frenchAccents.test(text) || frenchWords.test(text)) return 'fr';
+    return 'en';
+  };
+
   const handleApply = async (suggestion) => {
     setApplyingId(suggestion.suggestionId);
     
     try {
+      // Language preservation: warn if mismatch
+      const origLang = detectLanguage(suggestion.originalValue);
+      const improvedLang = detectLanguage(suggestion.improvedValue);
+      if (origLang !== 'unknown' && improvedLang !== 'unknown' && origLang !== improvedLang) {
+        const proceed = window.confirm(`The improved text appears to be ${improvedLang.toUpperCase()} while the original is ${origLang.toUpperCase()}. Apply anyway and keep the CV language consistent?`);
+        if (!proceed) {
+          setApplyingId(null);
+          return;
+        }
+      }
+
+      // Keep previous value for undo
+      setPrevValues((prev) => ({ ...prev, [suggestion.suggestionId]: suggestion.originalValue }));
+
       await onApplySuggestion(suggestion);
       
       // Mark as applied
@@ -52,6 +80,28 @@ export default function FieldSuggestions({ suggestions, onApplySuggestion }) {
       alert('Failed to apply suggestion. Please try again.');
     } finally {
       setApplyingId(null);
+    }
+  };
+
+  const handleUndo = async (suggestion) => {
+    setRevertingId(suggestion.suggestionId);
+    try {
+      const previous = prevValues[suggestion.suggestionId] ?? suggestion.originalValue;
+      const revertSuggestion = {
+        ...suggestion,
+        improvedValue: previous
+      };
+      await onApplySuggestion(revertSuggestion);
+      setAppliedSuggestions((prev) => {
+        const next = new Set(prev);
+        next.delete(suggestion.suggestionId);
+        return next;
+      });
+    } catch (e) {
+      console.error('Failed to revert suggestion:', e);
+      alert('Failed to revert change.');
+    } finally {
+      setRevertingId(null);
     }
   };
 
@@ -94,19 +144,24 @@ export default function FieldSuggestions({ suggestions, onApplySuggestion }) {
                   {sugg.severity?.toUpperCase()}
                 </span>
                 <span className="text-xs text-gray-600 font-medium">{sugg.issue_type}</span>
-                {sugg.impact && (
-                  <span className="text-xs px-2 py-1 rounded-full bg-purple-100 text-purple-800">
-                    Impact: {sugg.impact}
-                  </span>
-                )}
               </div>
               
-              {isApplied && (
-                <div className="flex items-center gap-1 text-green-700 font-semibold text-sm">
-                  <CheckCircle className="w-4 h-4" />
-                  Applied
+              {isApplied ? (
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 text-green-700 font-semibold text-sm">
+                    <CheckCircle className="w-4 h-4" />
+                    Applied
+                  </div>
+                  <button
+                    onClick={() => handleUndo(sugg)}
+                    disabled={revertingId === sugg.suggestionId}
+                    className={`flex items-center gap-1 px-2 py-1 rounded-md text-sm border ${revertingId === sugg.suggestionId ? 'bg-gray-200 text-gray-500' : 'hover:bg-gray-100'}`}
+                    title="Revert to previous value"
+                  >
+                    <Undo2 className="w-4 h-4" /> Undo
+                  </button>
                 </div>
-              )}
+              ) : null}
             </div>
             
             {/* Field Location */}

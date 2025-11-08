@@ -43,9 +43,9 @@ This document provides a quick summary of all changes made to improve the CV NLP
 - `frontend/.env.example` - Frontend environment config
 
 ### Documentation
-- `PRODUCTION_IMPROVEMENTS.md` - Detailed improvement documentation
+- `PRODUCTION_IMPROVEMENTS.md` - Deployment checklist and improvements
 - `CHANGES_SUMMARY.md` - This file
-- Updated `README.md` - Comprehensive project documentation
+- Updated `README.md` - Production-focused project documentation
 
 ## 📊 Files Modified
 
@@ -71,10 +71,9 @@ This document provides a quick summary of all changes made to improve the CV NLP
   - Used API service layer
   - Simplified state management
 
-## 🗑️ Files Removed
-- 22 accumulated JSON files from backend
-- node_modules directory from backend (shouldn't have been there)
-- package.json and package-lock.json from backend (Node deps in Python project)
+## 🗑️ Documentation Cleanup
+- Deprecated `REFACTORING_SUMMARY.md` (content consolidated)
+- Deprecated `SECTION_DETECTION_ENHANCEMENT.md` (merged into structured CV doc)
 
 ## 🔧 Configuration Management
 
@@ -250,5 +249,13 @@ The application has been transformed from a working prototype to a production-re
 - **Security best practices**
 - **Comprehensive documentation**
 - **Clear upgrade path**
+
+### Recent Notable Changes (Nov 2025)
+- Structured CV: dynamic sections (activities/"Vie Associative", volunteer, other_sections)
+- Skills: dynamic category rendering (technical, languages, tools, soft_skills, other) with defensive checks
+- UI cleanup: removed redundant Impact/High badges; removed language badges in Apply Changes
+- Apply/Undo for suggestions with same-language enforcement
+- CV Preview export to PDF; Structured CV export support
+- Defensive rendering across lists to avoid runtime errors like “.map is not a function”
 
 All critical and high-priority issues from the original problem statement have been addressed, with a clear roadmap for remaining enhancements.

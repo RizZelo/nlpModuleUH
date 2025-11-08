@@ -10,6 +10,7 @@ This implementation successfully transforms CV storage from plain text to a stru
 #### 1. CV Structure Parser (`cv_structure_parser.py`)
 - Parses CV text into structured JSON format using Gemini AI
 - Extracts fields: summary, contact, experience, education, skills, projects, certifications, awards, publications
+- Dynamic sections: activities (associations/"Vie Associative"), volunteer, and `other_sections` for any non-standard headers
 - Each entry has a unique ID for tracking
 - Function `apply_suggestion_to_structured_cv()` applies suggestions to specific fields
 
@@ -23,6 +24,7 @@ This implementation successfully transforms CV storage from plain text to a stru
   - `originalValue`: Current field value
   - `improvedValue`: Suggested replacement
   - `problem`, `explanation`, `severity`, `impact`
+  - Language preservation: suggestions must stay in the same language as the original CV
 
 #### 3. New API Endpoints (`main.py`)
 - `POST /analyze-structured`: Analyzes CV using structured data approach
@@ -45,18 +47,20 @@ This implementation successfully transforms CV storage from plain text to a stru
 **FieldSuggestions.jsx**
 - Displays field-targeted suggestions
 - Shows original vs improved values
-- "Apply" button for one-click updates
+- "Apply" and "Undo" for safe, reversible updates
 - Visual feedback for applied suggestions
 - Displays field path and target information
+- Validates language before applying (same-language enforcement)
 
 **StructuredCVDisplay.jsx**
 - Renders structured CV data in organized sections
 - Contact information with icons
 - Experience with timeline
 - Education with details
-- Skills categorized (technical, languages, tools)
+- Skills: dynamic categories (technical, languages, tools, soft_skills, other)
 - Projects with technologies
 - Certifications and awards
+- Activities, volunteer, and dynamic `other_sections` supported
 
 #### 3. Updated Components
 
@@ -105,10 +109,16 @@ This implementation successfully transforms CV storage from plain text to a stru
   education: [...],
   skills: {
     technical: ["Python", "React"],
-    languages: ["English"]
+    languages: ["English"],
+    tools: ["Git", "Docker"],
+    soft_skills: ["Communication"],
+    other: ["Additional"]
   },
   projects: [...],
   certifications: [...]
+  activities: [...],
+  volunteer: [...],
+  other_sections: { "hobbies": [ ... ] }
 }
 ```
 
@@ -147,6 +157,7 @@ This implementation successfully transforms CV storage from plain text to a stru
 - Error messages sanitized
 - Internal errors logged but not exposed
 - User-friendly error messages
+ - Defensive rendering in frontend prevents `.map()` on non-arrays
 
 ## Testing
 
@@ -182,6 +193,8 @@ const result = await applySuggestion(structuredCV, suggestion);
   suggestions={fieldSuggestions} 
   onApplySuggestion={handleApply}
 />
+// Undo example
+<FieldSuggestions onUndoSuggestion={handleUndo} />
 ```
 
 ## Files Changed
@@ -204,7 +217,7 @@ const result = await applySuggestion(structuredCV, suggestion);
 
 ## Backward Compatibility
 
-- Original `/analyze` endpoint still works
+> Note: The original `/analyze` endpoint has been removed in favor of `/analyze-structured`.
 - Can use either structured or original approach
 - No breaking changes to existing functionality
 
@@ -217,6 +230,7 @@ const result = await applySuggestion(structuredCV, suggestion);
 5. Bulk apply suggestions
 6. Custom field templates
 7. CV version history
+8. Optional migration from Gemini to local Ollama LLM (pending)
 
 ## Conclusion
 

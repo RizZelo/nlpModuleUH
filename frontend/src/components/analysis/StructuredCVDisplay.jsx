@@ -3,7 +3,7 @@
  * Displays the structured CV data in a readable format
  */
 import React from 'react';
-import { User, Briefcase, GraduationCap, Code, Award, FileText, Mail, Phone, MapPin } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Code, Award, FileText, Mail, Phone, MapPin, AlertCircle } from 'lucide-react';
 
 export default function StructuredCVDisplay({ structuredCV }) {
   if (!structuredCV) {
@@ -15,7 +15,7 @@ export default function StructuredCVDisplay({ structuredCV }) {
     );
   }
 
-  const { summary, contact, experience, education, skills, projects, certifications } = structuredCV;
+  const { summary, contact, experience, education, skills, projects, certifications, activities, volunteer, other_sections } = structuredCV;
 
   return (
     <div className="space-y-6">
@@ -67,7 +67,7 @@ export default function StructuredCVDisplay({ structuredCV }) {
       )}
 
       {/* Experience */}
-      {experience && experience.length > 0 && (
+      {Array.isArray(experience) && experience.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center gap-2 mb-4">
             <Briefcase className="w-5 h-5 text-blue-600" />
@@ -91,7 +91,7 @@ export default function StructuredCVDisplay({ structuredCV }) {
                 {exp.description && exp.description !== "Not provided" && (
                   <p className="text-sm text-gray-700 mb-2">{exp.description}</p>
                 )}
-                {exp.bullets && exp.bullets.length > 0 && (
+                {Array.isArray(exp.bullets) && exp.bullets.length > 0 && (
                   <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
                     {exp.bullets.map((bullet, bidx) => (
                       <li key={bidx}>{bullet}</li>
@@ -105,7 +105,7 @@ export default function StructuredCVDisplay({ structuredCV }) {
       )}
 
       {/* Education */}
-      {education && education.length > 0 && (
+      {Array.isArray(education) && education.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center gap-2 mb-4">
             <GraduationCap className="w-5 h-5 text-blue-600" />
@@ -143,48 +143,44 @@ export default function StructuredCVDisplay({ structuredCV }) {
             <h3 className="text-lg font-bold text-gray-900">Skills</h3>
           </div>
           <div className="space-y-3">
-            {skills.technical && skills.technical.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold text-gray-700 mb-2">Technical Skills</p>
-                <div className="flex flex-wrap gap-2">
-                  {skills.technical.map((skill, idx) => (
-                    <span key={idx} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                      {skill}
-                    </span>
-                  ))}
+            {Object.entries(skills).map(([category, items]) => {
+              if (!Array.isArray(items) || items.length === 0) return null;
+              
+              // Capitalize category name for display
+              const displayName = category
+                .split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+              
+              // Color mapping for different skill types
+              const colorMap = {
+                technical: 'bg-blue-100 text-blue-800',
+                languages: 'bg-green-100 text-green-800',
+                tools: 'bg-purple-100 text-purple-800',
+                soft_skills: 'bg-orange-100 text-orange-800',
+                other: 'bg-gray-100 text-gray-800'
+              };
+              const colorClass = colorMap[category] || 'bg-gray-100 text-gray-800';
+              
+              return (
+                <div key={category}>
+                  <p className="text-xs font-semibold text-gray-700 mb-2">{displayName}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {items.map((item, idx) => (
+                      <span key={idx} className={`px-3 py-1 ${colorClass} rounded-full text-xs`}>
+                        {item}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-            {skills.languages && skills.languages.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold text-gray-700 mb-2">Languages</p>
-                <div className="flex flex-wrap gap-2">
-                  {skills.languages.map((lang, idx) => (
-                    <span key={idx} className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                      {lang}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {skills.tools && skills.tools.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold text-gray-700 mb-2">Tools & Technologies</p>
-                <div className="flex flex-wrap gap-2">
-                  {skills.tools.map((tool, idx) => (
-                    <span key={idx} className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">
-                      {tool}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
+              );
+            })}
           </div>
         </div>
       )}
 
       {/* Projects */}
-      {projects && projects.length > 0 && (
+      {Array.isArray(projects) && projects.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center gap-2 mb-4">
             <Code className="w-5 h-5 text-blue-600" />
@@ -197,7 +193,7 @@ export default function StructuredCVDisplay({ structuredCV }) {
                 {proj.description && proj.description !== "Not provided" && (
                   <p className="text-sm text-gray-700 mt-1">{proj.description}</p>
                 )}
-                {proj.technologies && proj.technologies.length > 0 && (
+                {Array.isArray(proj.technologies) && proj.technologies.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {proj.technologies.map((tech, tidx) => (
                       <span key={tidx} className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs">
@@ -213,7 +209,7 @@ export default function StructuredCVDisplay({ structuredCV }) {
       )}
 
       {/* Certifications */}
-      {certifications && certifications.length > 0 && (
+      {Array.isArray(certifications) && certifications.length > 0 && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center gap-2 mb-4">
             <Award className="w-5 h-5 text-blue-600" />
@@ -230,6 +226,107 @@ export default function StructuredCVDisplay({ structuredCV }) {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Activities / Associations */}
+      {Array.isArray(activities) && activities.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <AlertCircle className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-bold text-gray-900">Activities & Associations</h3>
+          </div>
+          <div className="space-y-4">
+            {activities.map((act, idx) => (
+              <div key={act.id || idx} className="border-l-2 border-indigo-200 pl-4">
+                <div className="flex justify-between items-start mb-1">
+                  <div>
+                    <h4 className="font-bold text-gray-900 text-sm">{act.organization}</h4>
+                    {act.title && <p className="text-xs text-gray-600">{act.title}</p>}
+                  </div>
+                  <span className="text-xs text-gray-500">{act.startDate} - {act.endDate}</span>
+                </div>
+                {act.description && act.description !== 'Not provided' && (
+                  <p className="text-xs text-gray-700">{act.description}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Volunteer Work */}
+      {Array.isArray(volunteer) && volunteer.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <User className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-bold text-gray-900">Volunteer Experience</h3>
+          </div>
+          <div className="space-y-4">
+            {volunteer.map((vol, idx) => (
+              <div key={vol.id || idx} className="border-l-2 border-teal-200 pl-4">
+                <div className="flex justify-between items-start mb-1">
+                  <div>
+                    <h4 className="font-bold text-gray-900 text-sm">{vol.organization}</h4>
+                    {vol.role && <p className="text-xs text-gray-600">{vol.role}</p>}
+                  </div>
+                  <span className="text-xs text-gray-500">{vol.startDate} - {vol.endDate}</span>
+                </div>
+                {vol.description && vol.description !== 'Not provided' && (
+                  <p className="text-xs text-gray-700">{vol.description}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Other Sections (dynamically captured) */}
+      {other_sections && Object.keys(other_sections).length > 0 && (
+        <>
+          {Object.entries(other_sections).map(([sectionName, sectionData]) => {
+            if (!Array.isArray(sectionData) || sectionData.length === 0) return null;
+            
+            return (
+              <div key={sectionName} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <FileText className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-bold text-gray-900">
+                    {sectionName.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                  </h3>
+                </div>
+                <div className="space-y-3">
+                  {sectionData.map((item, idx) => (
+                    <div key={item.id || idx} className="border-l-2 border-gray-200 pl-4">
+                      {typeof item === 'object' ? (
+                        <div className="text-sm text-gray-700">
+                          {Object.entries(item).map(([key, value]) => {
+                            if (key === 'id' || !value || value === 'Not provided') return null;
+                            return (
+                              <div key={key} className="mb-1">
+                                <span className="font-semibold">{key.replace(/_/g, ' ')}: </span>
+                                <span>{typeof value === 'object' ? JSON.stringify(value) : value}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-700">{item}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </>
+      )}
+
+      {/* Empty state for missing sections */}
+      {!experience?.length && !education?.length && !projects?.length && !skills && !certifications?.length && !activities?.length && !volunteer?.length && (!other_sections || Object.keys(other_sections).length === 0) && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+          <AlertCircle className="w-10 h-10 text-yellow-500 mx-auto mb-3" />
+          <p className="text-sm text-yellow-800">No detailed sections parsed. Try re-uploading a clearer CV or using a different format.</p>
         </div>
       )}
     </div>

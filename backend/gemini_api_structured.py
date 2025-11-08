@@ -39,34 +39,120 @@ No specific job description provided. Analyze the CV for general quality, format
 """
     
     prompt = f"""
-Analyze this structured CV and provide detailed, field-targeted feedback.
+Analyze this structured CV and provide detailed, field-targeted feedback with STRICT, REALISTIC scoring.
 
 Structured CV Data:
 {cv_json}
 
 {job_context}
 
+LANGUAGE REQUIREMENT:
+- **CRITICAL**: Detect the language of the CV from the content
+- **All recommendations, suggestions, and improved text MUST be in the SAME language as the CV**
+- If CV is in French, respond in French
+- If CV is in Arabic, respond in Arabic  
+- If CV is in English, respond in English
+- If CV is in Spanish, respond in Spanish
+- Mixed language CVs: match the dominant language (>60% of content)
+- Field names in JSON structure remain in English, but ALL text content (improvedValue, explanations, suggestions, feedback) must match CV language
+
+SCORING RUBRIC (Be strict and honest):
+
+**Overall Score (0-10):**
+- 9-10: Exceptional - Ready to compete for top positions, zero improvements needed, perfect quantification
+- 7-8: Strong - Minor tweaks needed, well-structured with good metrics and compelling content
+- 5-6: Good foundation - Several improvements needed, lacks quantification or has generic content
+- 3-4: Needs work - Major gaps in content, weak descriptions, poor structure, or missing key information
+- 0-2: Poor - Requires complete overhaul, unprofessional, or incomprehensible
+
+**Formatting Score (0-10):**
+- 9-10: Perfect visual hierarchy, consistent spacing, ATS-friendly, professional structure
+- 7-8: Clean layout with 1-2 minor inconsistencies
+- 5-6: Readable but has formatting issues, inconsistent spacing, or cluttered sections
+- 3-4: Poor structure, hard to scan, inconsistent formatting throughout
+- 0-2: Chaotic layout, unprofessional, multiple major formatting issues
+
+**Content Score (0-10):**
+- 9-10: All bullets quantified, strong action verbs, highly relevant, zero fluff, impactful achievements
+- 7-8: Good content with some quantification, mostly strong verbs, 1-2 weak bullets
+- 5-6: Adequate but generic, minimal metrics, lacks specific achievements
+- 3-4: Vague descriptions, no quantification, weak verbs, significant gaps
+- 0-2: Minimal detail, no achievements, passive voice throughout
+
+**Section Quality Score (0-10):**
+- 9-10: Perfectly tailored, compelling, comprehensive, every bullet is strong
+- 7-8: Strong with 1-2 bullets needing improvement
+- 5-6: Functional but has generic content or missing key elements
+- 3-4: Weak, unclear, poorly organized, or mostly generic
+- 0-2: Missing critical information, confusing, or very poor quality
+
+**ATS Relevance Score (0-100):**
+- 90-100: Matches 90%+ of job requirements, optimal keyword density, perfect alignment
+- 70-89: Matches 70-89% of requirements, good keyword usage with minor gaps
+- 50-69: Matches 50-69% of requirements, some important keywords missing
+- 30-49: Matches 30-49% of requirements, significant gaps in keywords
+- 0-29: Poor match, most critical keywords missing
+
+CRITICAL SCORING GUIDELINES:
+- **Default to 5-6/10 for average CVs** - Most CVs are not excellent, be realistic
+- **Only award 9-10/10 if truly exceptional** - No room for improvement
+- **Be harsh but fair** - Identify real problems that hurt job prospects
+
+**Automatic Penalties (deduct from scores):**
+- Each generic statement without metrics ("responsible for", "worked on", "helped with"): -0.5 points
+- Each bullet missing quantification (no numbers, %, scale, or timeframe): -0.5 points
+- Grammatical errors or typos: -0.5 points each
+- Passive voice or weak verbs ("was", "did", "made"): -0.3 points each
+- Vague descriptions without specifics: -0.5 points each
+- Irrelevant content for target job: -1 point per section
+- Clichés without substance ("team player", "hard worker", "detail-oriented"): -0.3 each
+- Missing critical information (dates, company names, achievements): -1 point per instance
+- Poor formatting or inconsistent structure: -1 to -2 points total
+- No summary or weak summary: -1 point
+
+**Award Points For:**
+- Specific, quantified achievements with clear impact: +1 per strong bullet
+- Action verbs with measurable outcomes: +0.5
+- Relevant keywords naturally integrated: +0.5
+- Clear progression and growth shown: +1
+- Tailored content matching job description: +1-2
+
+**Severity Classifications:**
+- **Critical**: Blocks job application or severely damages credibility (typos in contact info, missing essential sections, major formatting breaks, completely generic content)
+- **High**: Significantly weakens CV impact (no metrics, vague descriptions, poor structure, weak bullets, missing keywords)
+- **Medium**: Noticeable but not deal-breaking (minor formatting issues, could be more specific, weak word choices)
+- **Low**: Polish and optimization (alternative phrasing, minor enhancements)
+
+FIELD-TARGETED SUGGESTIONS REQUIREMENTS:
+- Must identify EXACT field location using fieldPath
+- Every suggestion needs concrete "improvedValue" with complete replacement text **IN THE SAME LANGUAGE AS THE CV**
+- Focus on highest-impact changes first (prioritize High severity)
+- Identify at least 3-5 critical/high severity issues if they exist
+- Don't suggest changes to text that's already strong (9-10/10 quality)
+- Be specific about WHY each change matters (recruiter impact, ATS compatibility, clarity)
+- **All explanations, problems, and suggestions must be in the CV's language**
+
 Return your response as **valid JSON** with this EXACT structure (no markdown):
 
 {{
     "formatting": {{
         "score": <number 0-10>,
-        "issues": ["issue1", "issue2"],
-        "suggestions": ["suggestion1", "suggestion2"]
+        "issues": ["Specific issue with exact location (IN CV LANGUAGE), e.g., 'Inconsistent date formatting in Experience section - mix of MM/YYYY and Month Year'"],
+        "suggestions": ["Actionable fix with example (IN CV LANGUAGE), e.g., 'Standardize all dates to MM/YYYY format throughout CV'"]
     }},
     "content": {{
         "score": <number 0-10>,
-        "strengths": ["strength1", "strength2"],
-        "weaknesses": ["weakness1", "weakness2"],
-        "suggestions": ["suggestion1", "suggestion2"]
+        "strengths": ["Specific strength with concrete example from CV (IN CV LANGUAGE), e.g., 'Strong quantification in Python project: 15% efficiency improvement'"],
+        "weaknesses": ["Specific weakness with location (IN CV LANGUAGE), e.g., 'Experience section lacks metrics - 4 out of 6 bullets have no quantification'"],
+        "suggestions": ["Concrete improvement with before/after example (IN CV LANGUAGE)"]
     }},
     "general": {{
         "overall_score": <number 0-10>,
-        "summary": "brief overall assessment in 2-3 sentences",
+        "summary": "Honest 2-3 sentence assessment explaining the score (IN CV LANGUAGE). Mention specific strengths and the main areas holding the CV back.",
         "top_priorities": [
             {{
                 "priority": 1,
-                "action": "specific action to take",
+                "action": "Specific, actionable task with exact location (IN CV LANGUAGE) (e.g., 'Add quantified metrics to all 5 bullet points in Software Developer role at TechCorp')",
                 "impact": "High|Medium|Low",
                 "time_estimate": "5 mins|15 mins|30 mins|1 hour",
                 "category": "Formatting|Content|Keywords|ATS"
@@ -75,31 +161,31 @@ Return your response as **valid JSON** with this EXACT structure (no markdown):
     }},
     "sections": [
         {{
-            "name": "Experience|Education|Skills|etc",
+            "name": "Experience|Education|Skills|Summary|etc",
             "quality_score": <number 0-10>,
-            "feedback": "specific feedback for this section",
-            "suggestions": ["suggestion1", "suggestion2"]
+            "feedback": "Specific, honest feedback with examples from section (IN CV LANGUAGE). Identify what's weak and why.",
+            "suggestions": ["Concrete suggestion with example (IN CV LANGUAGE): 'Replace vague bullet \"Worked with databases\" with \"Optimized PostgreSQL queries reducing load time from 3s to 0.8s for 10K+ daily users\"'"]
         }}
     ],
     "field_suggestions": [
         {{
             "suggestionId": <unique number>,
             "targetField": "summary|experience|education|skills|etc",
-            "fieldPath": ["experience", 0, "description"],
-            "fieldId": "exp_1 (the ID from structured CV)",
-            "originalValue": "Current value of the field",
-            "improvedValue": "Suggested improved value",
+            "fieldPath": ["experience", 0, "description"] or ["summary"] or ["contact", "email"],
+            "fieldId": "exp_1|edu_1|skill_1 (the ID from structured CV)",
+            "originalValue": "EXACT current value of the field from CV (IN ORIGINAL CV LANGUAGE)",
+            "improvedValue": "Complete suggested replacement text (IN CV LANGUAGE) (REQUIRED - must be full, ready-to-use text)",
             "issue_type": "grammar|clarity|impact|keyword|formatting",
             "severity": "critical|high|medium|low",
-            "problem": "what's wrong with this field",
-            "explanation": "why this change matters",
+            "problem": "Clear, specific explanation of what's wrong (IN CV LANGUAGE) (e.g., 'Lacks quantification and uses weak passive voice')",
+            "explanation": "Why this change matters for recruiters/ATS (IN CV LANGUAGE) (e.g., 'Quantified achievements increase interview callbacks by 40% and show measurable impact')",
             "impact": "High|Medium|Low"
         }}
     ],
     "quick_wins": [
         {{
-            "change": "what to change",
-            "where": "which section or part",
+            "change": "Specific change with exact location and current issue (IN CV LANGUAGE) (e.g., 'Change \"Responsible for managing\" to \"Managed 5-person team, delivering 3 projects on time\"')",
+            "where": "Exact section and position (IN CV LANGUAGE) (e.g., 'Experience section, 2nd bullet under current role')",
             "targetField": "field name if applicable",
             "fieldPath": ["path", "to", "field"],
             "effort": "5 mins|15 mins",
@@ -108,29 +194,34 @@ Return your response as **valid JSON** with this EXACT structure (no markdown):
     ],
     "ats_analysis": {{
         "relevance_score": <number 0-100>,
-        "keyword_matches": ["keyword1", "keyword2"],
-        "missing_keywords": ["keyword1", "keyword2"],
-        "recommendations": ["recommendation1", "recommendation2"]
+        "keyword_matches": ["Specific keywords found with count (IN CV LANGUAGE), e.g., 'Python (mentioned 3x)', 'SQL (2x)'"],
+        "missing_keywords": ["Critical keywords from job description that are absent (IN CV LANGUAGE), e.g., 'Docker', 'CI/CD', 'Agile'"],
+        "recommendations": ["Specific placement suggestions (IN CV LANGUAGE), e.g., 'Add Docker keyword to DevOps project description in Experience section'"]
     }}
 }}
 
 IMPORTANT Guidelines for field_suggestions:
-- Each suggestion must target a SPECIFIC field in the structured CV
-- Use fieldPath to indicate the exact location: ["experience", 0, "description"] means experience[0].description
-- For simple fields: ["summary"] or ["contact", "email"]
-- For array items: ["experience", 1, "title"] means experience[1].title
-- Include the fieldId (like "exp_1") to help identify the entry
-- originalValue must match the current value in the CV
-- improvedValue should be the complete improved text for that field
-- Provide 5-15 high-impact field-targeted suggestions
-- Focus on fields that will have the most impact on CV effectiveness
+- Provide 8-15 high-impact, field-targeted suggestions (prioritize critical/high severity first)
+- Each suggestion must target a SPECIFIC field with exact fieldPath
+- Use fieldPath array notation:
+  * Simple fields: ["summary"] or ["contact", "email"]
+  * Array items: ["experience", 0, "description"] means experience[0].description
+  * Nested fields: ["experience", 1, "title"] means experience[1].title
+- Include the fieldId (like "exp_1", "edu_2") to identify the entry
+- originalValue must EXACTLY match current value in CV (word-for-word, IN ORIGINAL LANGUAGE)
+- improvedValue must be COMPLETE replacement text, ready to use as-is (IN CV LANGUAGE)
+- Focus on changes that matter: quantification, action verbs, clarity, keywords, impact
+- Don't waste suggestions on already-strong content (only suggest if score <8/10)
+- **MAINTAIN THE SAME LANGUAGE AS THE CV IN ALL TEXT FIELDS**
 
-For other fields:
-- Evaluate formatting, content, clarity, job relevance, and visual layout
-- For top_priorities, provide 3-5 actionable items with all required fields
-- For sections, analyze major CV sections (Experience, Education, Skills, Summary, etc.)
-- For quick_wins, focus on easy, high-impact changes with field references when applicable
-- Be concrete, helpful, and specific
+REMEMBER: 
+- **Average CVs score 5-6/10, not 8/10**
+- **Only exceptional CVs deserve 9-10/10**
+- **Be specific with exact field locations and complete replacement text**
+- **Prioritize high-severity issues that actually hurt job prospects**
+- **Every criticism must be constructive with concrete fix**
+- **Compare against real market standards, not idealized perfection**
+- **🌍 ALL RECOMMENDATIONS MUST BE IN THE SAME LANGUAGE AS THE CV 🌍**
 """
     
     try:

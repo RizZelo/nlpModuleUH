@@ -1,6 +1,6 @@
-# Production Readiness Improvements
+# Production Readiness & Deployment Checklist
 
-This document outlines the improvements made to make the CV NLP Analyzer production-ready.
+This document summarizes key improvements and a concise checklist to deploy safely to production.
 
 ## Completed Improvements
 
@@ -116,7 +116,22 @@ This document outlines the improvements made to make the CV NLP Analyzer product
   - UI configuration constants
 - Created `backend/.env.example` documenting all environment variables
 
-## Deployment Recommendations
+## Deployment Checklist
+
+- [ ] Environment variables set (backend/front)
+   - Backend: `GEMINI_API_KEY`, `CORS_ORIGINS`, `LOG_LEVEL`
+   - Frontend: `REACT_APP_API_URL`
+- [ ] CORS restricted to production domains
+- [ ] HTTPS/TLS configured (at load balancer / ingress)
+- [ ] Process manager for backend (systemd, supervisor, or container orchestrator)
+- [ ] Static hosting/CDN for frontend build
+- [ ] Error tracking (Sentry or equivalent)
+- [ ] Centralized logging and log rotation
+- [ ] Rate limiting and basic WAF (at gateway)
+- [ ] Request timeouts and body size limits
+- [ ] PDF export fonts validated (jsPDF defaults OK)
+- [ ] Health endpoints monitored (`/`)
+- [ ] Backups/retention policy for stored artifacts
 
 ### Environment Variables
 

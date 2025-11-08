@@ -109,17 +109,49 @@ Return ONLY valid JSON (no markdown) with this structure:
             "date": "Date",
             "link": "URL if available"
         }}
-    ]
+    ],
+    "activities": [
+        {{
+            "id": "act_1",
+            "organization": "Organization name (e.g., IEEE, club, association)",
+            "title": "Role/Position",
+            "startDate": "Start date",
+            "endDate": "End date or Present",
+            "description": "Description of involvement and achievements"
+        }}
+    ],
+    "volunteer": [
+        {{
+            "id": "vol_1",
+            "organization": "Organization name",
+            "role": "Role/Position",
+            "startDate": "Start date",
+            "endDate": "End date or Present",
+            "description": "Description"
+        }}
+    ],
+    "other_sections": {{
+        "section_name_1": [
+            {{
+                "id": "other_1",
+                "content": "Any content that doesn't fit standard categories"
+            }}
+        ]
+    }}
 }}
 
 Guidelines:
-- Extract ALL information from the CV accurately
+- Extract ALL information from the CV accurately, including unusual or non-standard sections
 - Use "Not provided" for missing fields
 - Generate unique IDs for each entry (exp_1, exp_2, edu_1, etc.)
 - Preserve the original wording and details
 - If a section is completely absent, use an empty array or object
 - For experience/education bullets, try to extract individual points
 - Skills should be categorized appropriately
+- Activities should include: clubs, associations, memberships, extracurricular activities, leadership roles
+- Common activity section names: "Vie Associative", "Extracurricular Activities", "Leadership", "Memberships", "Student Organizations"
+- If you find sections that don't match the standard fields above, add them to "other_sections" with the section name as the key
+- Capture EVERY section header you see in the CV, even if it's unique or uncommon
 """
     
     try:

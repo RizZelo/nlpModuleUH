@@ -1,10 +1,10 @@
-# Test Plan for Merged CV Analyzer
+# Test Plan for CV NLP Analyzer (Production)
 
 ## Prerequisites
 1. Install backend dependencies:
    ```bash
    cd backend
-   pip install -r requirements_merged.txt
+   pip install -r requirements.txt
    ```
 
 2. Install frontend dependencies:
@@ -66,7 +66,7 @@ Expected response:
 ```json
 {
   "status": "API is running!",
-  "message": "Use POST /analyze to process CVs",
+   "message": "Use POST /analyze-structured to process CVs",
   "gemini_configured": true
 }
 ```
@@ -86,9 +86,8 @@ Expected:
 
 #### Test 3.2: UI Components Render
 - [ ] File upload area visible
-- [ ] Job description textarea visible
-- [ ] "Analyze CV with AI" button visible
-- [ ] Optional label on job description
+- [ ] Job description textarea visible (optional)
+- [ ] Analyze button visible and enabled when file present
 - [ ] Supported formats listed
 
 ### 4. End-to-End Tests
@@ -102,12 +101,7 @@ Expected:
 Expected:
 - Loading spinner appears
 - Analysis completes without errors
-- Dashboard shows:
-  - Overall score
-  - ATS score
-  - Navigation tabs (6 tabs)
-  - Overview with summary
-  - Top priorities sidebar
+- Analysis container tabs available: CV Preview, Structured CV, Apply Changes
 
 #### Test 4.2: Upload PDF (without job description)
 1. Upload a PDF CV
@@ -132,33 +126,29 @@ Expected:
 #### Test 4.4: Test Each Tab
 1. Complete Test 4.1
 2. Click through each tab:
-   - Overview: Summary, critical issues, score breakdown
-   - Editor: Editable text, can modify
-   - Suggestions: List of inline suggestions
-   - Sections: Per-section analysis
-   - ATS: Keyword matches, missing keywords
-   - Quick Wins: Quick improvement items
+   - CV Preview: Professional formatted preview and Export PDF button
+   - Structured CV: Sectioned data (experience, education, projects, skills, activities, volunteer, other_sections)
+   - Apply Changes: Field-targeted suggestions with Apply/Undo and language validation
 
 Expected: All tabs render without errors
 
-#### Test 4.5: Apply Suggestion
+#### Test 4.5: Apply/Undo Suggestion
 1. Complete Test 4.1
-2. Go to "Suggestions" tab
-3. Click "Apply This Suggestion" on any suggestion
+2. Go to "Apply Changes" tab
+3. Click "Apply" on any suggestion
+4. Click "Undo" to revert
 
 Expected:
-- Switch to Editor tab
-- Text updated with suggestion
-- No errors
+- Structured CV field updated accordingly
+- Undo restores previous value
+- No errors; language mismatch prevents apply with clear message
 
-#### Test 4.6: Edit and Export
+#### Test 4.6: Export PDF
 1. Complete Test 4.1
-2. Go to "Editor" tab
-3. Make some edits to the text
-4. Click "Export PDF"
+2. Click "Export PDF" from CV Preview or Structured CV
 
 Expected:
-- Print dialog opens
+- Print dialog opens (or file download)
 - PDF can be saved/printed
 - Formatting preserved
 
@@ -225,6 +215,13 @@ Expected:
 
 Expected:
 - Alert: "Failed to extract text from file. Please ensure the file is valid..."
+
+#### Test 6.5: Defensive Rendering (Skills)
+1. Force backend to return non-array for `skills.technical` (e.g., a string)
+2. Open Structured CV tab
+
+Expected:
+- No runtime error; section gracefully omitted
 
 ### 7. Performance Tests
 

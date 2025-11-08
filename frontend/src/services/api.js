@@ -13,28 +13,7 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || (
  * @param {string} jobDescription - Optional job description for targeted analysis
  * @returns {Promise<Object>} Analysis results
  */
-export async function analyzeCV(cvFile, jobDescription = '') {
-  const formData = new FormData();
-  formData.append('cv_file', cvFile);
-  formData.append('job_description', jobDescription);
-
-  const response = await fetch(`${API_BASE_URL}/analyze`, {
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const data = await response.json();
-
-  if (data.gemini_analysis?.error) {
-    throw new Error(data.gemini_analysis.error);
-  }
-
-  return data;
-}
+// Removed legacy analyzeCV (POST /analyze). Use analyzeStructuredCV instead.
 
 /**
  * Analyzes a CV file using structured data approach
