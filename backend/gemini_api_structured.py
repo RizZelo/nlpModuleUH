@@ -46,15 +46,18 @@ Structured CV Data:
 
 {job_context}
 
-LANGUAGE REQUIREMENT:
-- **CRITICAL**: Detect the language of the CV from the content
-- **All recommendations, suggestions, and improved text MUST be in the SAME language as the CV**
-- If CV is in French, respond in French
-- If CV is in Arabic, respond in Arabic  
-- If CV is in English, respond in English
-- If CV is in Spanish, respond in Spanish
-- Mixed language CVs: match the dominant language (>60% of content)
-- Field names in JSON structure remain in English, but ALL text content (improvedValue, explanations, suggestions, feedback) must match CV language
+CRITICAL LANGUAGE REQUIREMENT – READ THIS FIRST:
+
+STEP 1: Detect the CV’s language by examining the actual text content:
+-Look at job titles, education, descriptions, skills in the CV data above
+-Identify if it’s English, French, Arabic, Spanish, or another language
+STEP 2: Use ONLY that detected language for ALL your responses:
+-ALL recommendations → in CV’s language
+-ALL suggestions → in CV’s language
+-ALL improvedValue fields → in CV’s language
+-ALL explanations → in CV’s language
+-ALL problem descriptions → in CV’s language
+-ALL feedback → in CV’s language
 
 SCORING RUBRIC (Be strict and honest):
 

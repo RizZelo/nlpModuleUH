@@ -6,14 +6,15 @@ import React, { useState } from 'react';
 import { 
   Sparkles, Target, Edit3,
   FileText, TrendingUp, Zap, Clock, AlertCircle, 
-  CheckCircle, XCircle, Layers, Database, Download
+  CheckCircle, XCircle, Layers, Database
 } from 'lucide-react';
 import CVViewer from './CVViewer';
 import AnalysisTab from './tabs/AnalysisTab';
 import StatisticsTab from './tabs/StatisticsTab';
 import FieldSuggestions from './FieldSuggestions';
 import StructuredCVDisplay from './StructuredCVDisplay';
-import { exportStructuredCVToPdf } from '../../utils/exportPdf';
+// PDF export removed; using Markdown export instead
+import { generateMarkdownCV } from '../../utils/generateMarkdownCV';
 
 export default function AnalysisContainer({ 
   analysis, 
@@ -25,6 +26,24 @@ export default function AnalysisContainer({
   onApplySuggestion 
 }) {
   const [activeTab, setActiveTab] = useState('overview');
+  
+  const handleExportMarkdown = () => {
+    try {
+      const md = generateMarkdownCV(structuredCV || {});
+      const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'cv.md';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Export Markdown failed:', e);
+      alert('Failed to export Markdown.');
+    }
+  };
   
   const fieldSuggestions = analysis.field_suggestions || [];
   const quickWins = analysis.quick_wins || [];
@@ -135,13 +154,15 @@ export default function AnalysisContainer({
                         and better tracking of your CV content.
                       </p>
                     </div>
-                    <button
-                      onClick={() => exportStructuredCVToPdf(structuredCV)}
-                      className="ml-auto inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
-                    >
-                      <Download className="w-4 h-4" />
-                      Export PDF
-                    </button>
+                    <div className="ml-auto flex items-center gap-2">
+                      <button
+                        onClick={handleExportMarkdown}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+                      >
+                        <FileText className="w-4 h-4" />
+                        Export Markdown
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <StructuredCVDisplay structuredCV={structuredCV} />

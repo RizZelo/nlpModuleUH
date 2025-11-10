@@ -255,7 +255,7 @@ The application has been transformed from a working prototype to a production-re
 - Skills: dynamic category rendering (technical, languages, tools, soft_skills, other) with defensive checks
 - UI cleanup: removed redundant Impact/High badges; removed language badges in Apply Changes
 - Apply/Undo for suggestions with same-language enforcement
-- CV Preview export to PDF; Structured CV export support
+- Removed PDF export (replaced with Markdown export for structured data)
 - Defensive rendering across lists to avoid runtime errors like “.map is not a function”
 
 All critical and high-priority issues from the original problem statement have been addressed, with a clear roadmap for remaining enhancements.

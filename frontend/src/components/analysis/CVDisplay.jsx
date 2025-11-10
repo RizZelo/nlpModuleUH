@@ -4,49 +4,12 @@
  */
 import React from 'react';
 import { formatCVText } from '../../utils/formatCV';
-import { Download, Eye } from 'lucide-react';
+import { Eye } from 'lucide-react';
 
 export default function CVDisplay({ cvText, structured }) {
   const formattedHTML = formatCVText(cvText);
 
-  const handleDownloadPDF = () => {
-    const printWindow = window.open('', '_blank');
-    
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>CV</title>
-          <style>
-            @page { margin: 0.75in; }
-            * { box-sizing: border-box; }
-            body { 
-              font-family: Georgia, 'Times New Roman', serif; 
-              font-size: 11pt; 
-              line-height: 1.5;
-              color: #000;
-              margin: 0;
-              padding: 0;
-            }
-            h1 { font-size: 24pt; margin: 0 0 8px 0; }
-            h2 { font-size: 14pt; margin: 18px 0 6px 0; border-bottom: 1px solid #333; padding-bottom: 2px; }
-            h3 { font-size: 12pt; margin: 12px 0 4px 0; font-weight: 600; }
-            p { margin: 0 0 8px 0; }
-            ul { margin: 4px 0 12px 0; padding-left: 20px; }
-            li { margin-bottom: 4px; }
-            strong { font-weight: 600; }
-            .text-center { text-align: center; }
-          </style>
-        </head>
-        <body>${formattedHTML}</body>
-      </html>
-    `);
-    
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 300);
-  };
+  // PDF export removed; using Markdown export in Structured CV tab instead.
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -55,15 +18,7 @@ export default function CVDisplay({ cvText, structured }) {
           <Eye className="w-5 h-5 text-blue-600" />
           CV Preview
         </h2>
-          <div className="flex gap-2">
-          <button
-            onClick={handleDownloadPDF}
-            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-medium flex items-center gap-1 text-sm"
-          >
-            <Download className="w-4 h-4" />
-            Export PDF
-          </button>
-        </div>
+        
       </div>
       
       {/* Safe to use dangerouslySetInnerHTML here because:
@@ -76,7 +31,7 @@ export default function CVDisplay({ cvText, structured }) {
       />
       
       <div className="bg-gray-50 border-t border-gray-200 p-4 text-sm text-gray-600">
-        Professional CV display • Click "Export PDF" to download
+        Professional CV display
       </div>
     </div>
   );

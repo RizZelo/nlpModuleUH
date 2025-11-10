@@ -9,7 +9,7 @@ An intelligent CV analysis tool that parses CVs into structured data, generates 
 - Structured data: summary, contact, experience, education, skills, projects, certifications, activities, volunteer, other_sections
 - Apply / Undo field-targeted suggestions (language preserved)
 - Dynamic section detection (e.g., “Vie Associative”) with automatic UI rendering
-- Professional read-only CV preview and PDF export
+- Professional read-only CV preview (Markdown export available for structured data)
 - Defensive rendering (no `.map` errors on unexpected data types)
 
 ## Project Structure
