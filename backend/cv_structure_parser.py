@@ -20,7 +20,7 @@ def parse_cv_to_structured_data(cv_text: str, api_key: str) -> dict:
         dict: Structured CV data with fields like summary, experience, skills, etc.
     """
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-2.0-flash-exp")
+    model = genai.GenerativeModel("gemini-2.0-flash-lite")
     
     prompt = f"""
 Parse this CV/resume into a structured JSON format. Extract and organize all information.

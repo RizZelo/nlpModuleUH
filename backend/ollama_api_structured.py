@@ -1,29 +1,140 @@
 """
-Enhanced Gemini API Module for Structured CV Analysis
-Generates suggestions that target specific fields in the structured CV data
+Ollama API Module for Structured CV Analysis
+Generates suggestions that target specific fields in the structured CV data using local LLM
 """
 
-from google import generativeai as genai
 import json
 import re
+import requests
+from typing import Dict, List, Optional
 from PIL import Image
+import base64
+import io
 
 
-def analyze_structured_cv_with_gemini(structured_cv: dict, job_description: str, api_key: str, cv_images: list = None):
+class OllamaClient:
+    """Client for interacting with Ollama API"""
+    
+    def __init__(self, base_url: str = "http://localhost:11434", model: str = "llama3.1:8b"):
+        self.base_url = base_url.rstrip('/')
+        self.model = model
+        
+    def _encode_image_to_base64(self, image: Image.Image) -> str:
+        """Convert PIL Image to base64 string"""
+        buffer = io.BytesIO()
+        image.save(buffer, format='PNG')
+        img_data = buffer.getvalue()
+        return base64.b64encode(img_data).decode('utf-8')
+    
+    def generate_chat(self, messages: List[Dict], images: Optional[List[Image.Image]] = None) -> str:
+        """Generate response using Ollama chat API"""
+        
+        # Prepare the messages
+        formatted_messages = []
+        
+        # If images are provided, add them to the first message
+        if images and len(images) > 0:
+            image_data = []
+            for img in images[:3]:  # Limit to 3 images like Gemini
+                if isinstance(img, str):
+                    img = Image.open(img)
+                image_data.append(self._encode_image_to_base64(img))
+            
+            # For vision models, we need to include images
+            formatted_messages = [
+                {
+                    "role": "user",
+                    "content": messages[0]["content"],
+                    "images": image_data
+                }
+            ]
+        else:
+            formatted_messages = messages
+        
+        try:
+            response = requests.post(
+                f"{self.base_url}/api/chat",
+                json={
+                    "model": self.model,
+                    "messages": formatted_messages,
+                    "stream": False,
+                    "options": {
+                        "temperature": 0.3,  # Lower temperature for more consistent JSON output
+                        "top_k": 10,
+                        "top_p": 0.9
+                    }
+                },
+                timeout=120  # 2 minutes timeout for complex analysis
+            )
+            
+            response.raise_for_status()
+            result = response.json()
+            
+            return result["message"]["content"]
+            
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Ollama API request failed: {str(e)}")
+        except KeyError as e:
+            raise Exception(f"Unexpected Ollama API response format: {str(e)}")
+
+
+def check_ollama_connection(base_url: str = "http://localhost:11434", model: str = "llama3.1:8b") -> Dict:
+    """Check if Ollama is running and model is available"""
+    try:
+        # Check if Ollama is running
+        response = requests.get(f"{base_url.rstrip('/')}/api/tags", timeout=10)
+        response.raise_for_status()
+        
+        available_models = response.json()
+        model_names = [m["name"] for m in available_models.get("models", [])]
+        
+        model_available = any(model in name for name in model_names)
+        
+        return {
+            "ollama_running": True,
+            "model_available": model_available,
+            "available_models": model_names,
+            "recommended_models": [
+                "llama3.1:8b",
+                "llama3.1:70b", 
+                "mistral:7b",
+                "codellama:7b",
+                "qwen2.5:7b"
+            ]
+        }
+        
+    except requests.exceptions.RequestException:
+        return {
+            "ollama_running": False,
+            "model_available": False,
+            "available_models": [],
+            "error": "Ollama is not running or not accessible"
+        }
+
+
+def analyze_structured_cv_with_ollama(
+    structured_cv: dict, 
+    job_description: str, 
+    ollama_url: str = "http://localhost:11434",
+    model: str = "llama3.1:8b",
+    cv_images: list = None
+) -> dict:
     """
-    Analyze structured CV data with Gemini and return field-targeted suggestions.
+    Analyze structured CV data with Ollama and return field-targeted suggestions.
     
     Args:
         structured_cv: The structured CV data (from cv_structure_parser)
         job_description: The job description to match against (optional)
-        api_key: Gemini API key
+        ollama_url: Ollama server URL (default: http://localhost:11434)
+        model: Ollama model name (default: llama3.1:8b)
         cv_images: Optional list of PIL Image objects showing CV layout
     
     Returns:
         dict: Analysis with field-targeted suggestions
     """
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-2.0-flash-exp")
+    
+    # Initialize Ollama client
+    client = OllamaClient(base_url=ollama_url, model=model)
     
     # Convert structured CV to readable format for AI
     cv_json = json.dumps(structured_cv, indent=2)
@@ -39,7 +150,7 @@ No specific job description provided. Analyze the CV for general quality, format
 """
     
     prompt = f"""
-Analyze this structured CV and provide detailed, field-targeted feedback with STRICT, REALISTIC scoring.
+You are an expert CV/resume reviewer. Analyze this structured CV and provide detailed, field-targeted feedback with STRICT, REALISTIC scoring.
 
 Structured CV Data:
 {cv_json}
@@ -48,16 +159,16 @@ Structured CV Data:
 
 CRITICAL LANGUAGE REQUIREMENT – READ THIS FIRST:
 
-STEP 1: Detect the CV’s language by examining the actual text content:
+STEP 1: Detect the CV's language by examining the actual text content:
 -Look at job titles, education, descriptions, skills in the CV data above
--Identify if it’s English, French, Arabic, Spanish, or another language
+-Identify if it's English, French, Arabic, Spanish, or another language
 STEP 2: Use ONLY that detected language for ALL your responses:
--ALL recommendations → in CV’s language
--ALL suggestions → in CV’s language
--ALL improvedValue fields → in CV’s language
--ALL explanations → in CV’s language
--ALL problem descriptions → in CV’s language
--ALL feedback → in CV’s language
+-ALL recommendations → in CV's language
+-ALL suggestions → in CV's language
+-ALL improvedValue fields → in CV's language
+-ALL explanations → in CV's language
+-ALL problem descriptions → in CV's language
+-ALL feedback → in CV's language
 
 SCORING RUBRIC (Be strict and honest):
 
@@ -121,10 +232,10 @@ CRITICAL SCORING GUIDELINES:
 - Tailored content matching job description: +1-2
 
 **Severity Classifications:**
-- **Critical**: Blocks job application or severely damages credibility (typos in contact info, missing essential sections, major formatting breaks, completely generic content)
-- **High**: Significantly weakens CV impact (no metrics, vague descriptions, poor structure, weak bullets, missing keywords)
-- **Medium**: Noticeable but not deal-breaking (minor formatting issues, could be more specific, weak word choices)
-- **Low**: Polish and optimization (alternative phrasing, minor enhancements)
+- **Critical**: Blocks job application or severely damages credibility
+- **High**: Significantly weakens CV impact
+- **Medium**: Noticeable but not deal-breaking
+- **Low**: Polish and optimization
 
 FIELD-TARGETED SUGGESTIONS REQUIREMENTS:
 - Must identify EXACT field location using fieldPath
@@ -135,27 +246,27 @@ FIELD-TARGETED SUGGESTIONS REQUIREMENTS:
 - Be specific about WHY each change matters (recruiter impact, ATS compatibility, clarity)
 - **All explanations, problems, and suggestions must be in the CV's language**
 
-Return your response as **valid JSON** with this EXACT structure (no markdown):
+You MUST return your response as a valid JSON object with this EXACT structure (no markdown, no code blocks):
 
 {{
     "formatting": {{
         "score": <number 0-10>,
-        "issues": ["Specific issue with exact location (IN CV LANGUAGE), e.g., 'Inconsistent date formatting in Experience section - mix of MM/YYYY and Month Year'"],
-        "suggestions": ["Actionable fix with example (IN CV LANGUAGE), e.g., 'Standardize all dates to MM/YYYY format throughout CV'"]
+        "issues": ["Specific issue with exact location (IN CV LANGUAGE)"],
+        "suggestions": ["Actionable fix with example (IN CV LANGUAGE)"]
     }},
     "content": {{
         "score": <number 0-10>,
-        "strengths": ["Specific strength with concrete example from CV (IN CV LANGUAGE), e.g., 'Strong quantification in Python project: 15% efficiency improvement'"],
-        "weaknesses": ["Specific weakness with location (IN CV LANGUAGE), e.g., 'Experience section lacks metrics - 4 out of 6 bullets have no quantification'"],
+        "strengths": ["Specific strength with concrete example from CV (IN CV LANGUAGE)"],
+        "weaknesses": ["Specific weakness with location (IN CV LANGUAGE)"],
         "suggestions": ["Concrete improvement with before/after example (IN CV LANGUAGE)"]
     }},
     "general": {{
         "overall_score": <number 0-10>,
-        "summary": "Honest 2-3 sentence assessment explaining the score (IN CV LANGUAGE). Mention specific strengths and the main areas holding the CV back.",
+        "summary": "Honest 2-3 sentence assessment explaining the score (IN CV LANGUAGE)",
         "top_priorities": [
             {{
                 "priority": 1,
-                "action": "Specific, actionable task with exact location (IN CV LANGUAGE) (e.g., 'Add quantified metrics to all 5 bullet points in Software Developer role at TechCorp')",
+                "action": "Specific, actionable task with exact location (IN CV LANGUAGE)",
                 "impact": "High|Medium|Low",
                 "time_estimate": "5 mins|15 mins|30 mins|1 hour",
                 "category": "Formatting|Content|Keywords|ATS"
@@ -166,29 +277,29 @@ Return your response as **valid JSON** with this EXACT structure (no markdown):
         {{
             "name": "Experience|Education|Skills|Summary|etc",
             "quality_score": <number 0-10>,
-            "feedback": "Specific, honest feedback with examples from section (IN CV LANGUAGE). Identify what's weak and why.",
-            "suggestions": ["Concrete suggestion with example (IN CV LANGUAGE): 'Replace vague bullet \"Worked with databases\" with \"Optimized PostgreSQL queries reducing load time from 3s to 0.8s for 10K+ daily users\"'"]
+            "feedback": "Specific, honest feedback with examples from section (IN CV LANGUAGE)",
+            "suggestions": ["Concrete suggestion with example (IN CV LANGUAGE)"]
         }}
     ],
     "field_suggestions": [
         {{
             "suggestionId": <unique number>,
             "targetField": "summary|experience|education|skills|etc",
-            "fieldPath": ["experience", 0, "description"] or ["summary"] or ["contact", "email"],
-            "fieldId": "exp_1|edu_1|skill_1 (the ID from structured CV)",
+            "fieldPath": ["experience", 0, "description"],
+            "fieldId": "exp_1|edu_1|skill_1",
             "originalValue": "EXACT current value of the field from CV (IN ORIGINAL CV LANGUAGE)",
-            "improvedValue": "Complete suggested replacement text (IN CV LANGUAGE) (REQUIRED - must be full, ready-to-use text)",
+            "improvedValue": "Complete suggested replacement text (IN CV LANGUAGE)",
             "issue_type": "grammar|clarity|impact|keyword|formatting",
             "severity": "critical|high|medium|low",
-            "problem": "Clear, specific explanation of what's wrong (IN CV LANGUAGE) (e.g., 'Lacks quantification and uses weak passive voice')",
-            "explanation": "Why this change matters for recruiters/ATS (IN CV LANGUAGE) (e.g., 'Quantified achievements increase interview callbacks by 40% and show measurable impact')",
+            "problem": "Clear explanation of what's wrong (IN CV LANGUAGE)",
+            "explanation": "Why this change matters for recruiters/ATS (IN CV LANGUAGE)",
             "impact": "High|Medium|Low"
         }}
     ],
     "quick_wins": [
         {{
-            "change": "Specific change with exact location and current issue (IN CV LANGUAGE) (e.g., 'Change \"Responsible for managing\" to \"Managed 5-person team, delivering 3 projects on time\"')",
-            "where": "Exact section and position (IN CV LANGUAGE) (e.g., 'Experience section, 2nd bullet under current role')",
+            "change": "Specific change with exact location (IN CV LANGUAGE)",
+            "where": "Exact section and position (IN CV LANGUAGE)",
             "targetField": "field name if applicable",
             "fieldPath": ["path", "to", "field"],
             "effort": "5 mins|15 mins",
@@ -197,57 +308,52 @@ Return your response as **valid JSON** with this EXACT structure (no markdown):
     ],
     "ats_analysis": {{
         "relevance_score": <number 0-100>,
-        "keyword_matches": ["Specific keywords found with count (IN CV LANGUAGE), e.g., 'Python (mentioned 3x)', 'SQL (2x)'"],
-        "missing_keywords": ["Critical keywords from job description that are absent (IN CV LANGUAGE), e.g., 'Docker', 'CI/CD', 'Agile'"],
-        "recommendations": ["Specific placement suggestions (IN CV LANGUAGE), e.g., 'Add Docker keyword to DevOps project description in Experience section'"]
+        "keyword_matches": ["Specific keywords found (IN CV LANGUAGE)"],
+        "missing_keywords": ["Critical keywords missing (IN CV LANGUAGE)"],
+        "recommendations": ["Specific placement suggestions (IN CV LANGUAGE)"]
     }}
 }}
 
-IMPORTANT Guidelines for field_suggestions:
-- Provide 8-15 high-impact, field-targeted suggestions (prioritize critical/high severity first)
-- Each suggestion must target a SPECIFIC field with exact fieldPath
-- Use fieldPath array notation:
-  * Simple fields: ["summary"] or ["contact", "email"]
-  * Array items: ["experience", 0, "description"] means experience[0].description
-  * Nested fields: ["experience", 1, "title"] means experience[1].title
-- Include the fieldId (like "exp_1", "edu_2") to identify the entry
-- originalValue must EXACTLY match current value in CV (word-for-word, IN ORIGINAL LANGUAGE)
-- improvedValue must be COMPLETE replacement text, ready to use as-is (IN CV LANGUAGE)
-- Focus on changes that matter: quantification, action verbs, clarity, keywords, impact
-- Don't waste suggestions on already-strong content (only suggest if score <8/10)
-- **MAINTAIN THE SAME LANGUAGE AS THE CV IN ALL TEXT FIELDS**
-
-REMEMBER: 
-- **Average CVs score 5-6/10, not 8/10**
-- **Only exceptional CVs deserve 9-10/10**<
-- **Be specific with exact field locations and complete replacement text**
-- **Prioritize high-severity issues that actually hurt job prospects**
-- **Every criticism must be constructive with concrete fix**
-- **Compare against real market standards, not idealized perfection**
-- **🌍 ALL RECOMMENDATIONS MUST BE IN THE SAME LANGUAGE AS THE CV 🌍**
+IMPORTANT: 
+- Response must be ONLY valid JSON, no markdown code blocks, no extra text
+- All text fields must be in the same language as the CV
+- Average CVs score 5-6/10, not 8/10
+- Only exceptional CVs deserve 9-10/10
+- Focus on high-impact, actionable suggestions
 """
-    
+
     try:
+        messages = [{"role": "user", "content": prompt}]
+        
         # Generate content with or without images
         if cv_images and len(cv_images) > 0:
-            content_parts = [prompt]
-            for i, img in enumerate(cv_images[:3]):
-                if isinstance(img, str):
-                    img = Image.open(img)
-                content_parts.append(img)
-            print(f"   🖼️  Sending {len(content_parts) - 1} images to Gemini for visual analysis...")
-            response = model.generate_content(content_parts)
+            print(f"   🖼️  Sending {len(cv_images)} images to Ollama for visual analysis...")
+            response_text = client.generate_chat(messages, images=cv_images)
         else:
-            response = model.generate_content(prompt)
+            response_text = client.generate_chat(messages)
         
-        response_text = response.text.strip()
+        response_text = response_text.strip()
         
-        # Remove any markdown code blocks
+        # Clean up response - remove any markdown code blocks that might have been added
         json_match = re.search(r'```(?:json)?\s*(.*?)\s*```', response_text, re.DOTALL)
         if json_match:
             response_text = json_match.group(1).strip()
         
-        parsed = json.loads(response_text)
+        # Remove any leading/trailing text that isn't JSON
+        start_brace = response_text.find('{')
+        end_brace = response_text.rfind('}')
+        
+        if start_brace != -1 and end_brace != -1:
+            response_text = response_text[start_brace:end_brace+1]
+        
+        try:
+            parsed = json.loads(response_text)
+        except json.JSONDecodeError:
+            # Try to fix common JSON issues
+            response_text = response_text.replace('\n', ' ').replace('\r', '')
+            response_text = re.sub(r',\s*}', '}', response_text)
+            response_text = re.sub(r',\s*]', ']', response_text)
+            parsed = json.loads(response_text)
         
         # Convert to frontend-compatible structure
         ats_analysis = parsed.get("ats_analysis", {})
@@ -263,13 +369,15 @@ REMEMBER:
             return bool(re.search(pattern, text.lower()))
         
         for keyword in ats_analysis.get("keyword_matches", []):
-            if is_keyword_in_text(keyword, cv_text):
+            keyword_clean = keyword.split('(')[0].strip()  # Remove count info if present
+            if is_keyword_in_text(keyword_clean, cv_text):
                 validated_keyword_matches.append(keyword)
             else:
                 validated_missing_keywords.append(keyword)
         
         for keyword in ats_analysis.get("missing_keywords", []):
-            if not is_keyword_in_text(keyword, cv_text):
+            keyword_clean = keyword.split('(')[0].strip()
+            if not is_keyword_in_text(keyword_clean, cv_text):
                 validated_missing_keywords.append(keyword)
             else:
                 validated_keyword_matches.append(keyword)
@@ -285,7 +393,7 @@ REMEMBER:
                 'readability_score': 80 + (parsed["formatting"]["score"] - 5) * 4,
                 'summary': parsed["general"]["summary"],
                 'critical_issues': parsed["formatting"]["issues"] + parsed["content"]["weaknesses"],
-                'field_suggestions': parsed.get("field_suggestions", []),  # NEW: Field-targeted suggestions
+                'field_suggestions': parsed.get("field_suggestions", []),  # Field-targeted suggestions
                 'section_analysis': parsed.get("sections", []),
                 'quick_wins': parsed.get("quick_wins", []),
                 'top_priorities': parsed["general"]["top_priorities"],
@@ -303,21 +411,21 @@ REMEMBER:
             }
         }
         
-        print(f"✅ Generated {len(parsed.get('field_suggestions', []))} field-targeted suggestions")
+        print(f"✅ Generated {len(parsed.get('field_suggestions', []))} field-targeted suggestions using Ollama")
         return analysis_result
         
     except json.JSONDecodeError as e:
         print(f"❌ JSON parsing error: {str(e)}")
-        print(f"Raw response: {response_text[:300]}")
+        print(f"Raw response: {response_text[:300]}...")
         return {
             "status": "error",
-            "message": "Failed to parse Gemini response",
-            "raw_output": response_text[:300]
+            "message": "Failed to parse Ollama response as JSON",
+            "raw_output": response_text[:500]
         }
     
     except Exception as e:
-        print(f"❌ Gemini API error: {str(e)}")
+        print(f"❌ Ollama API error: {str(e)}")
         return {
             "status": "error",
-            "message": f"Gemini API error: {str(e)}"
+            "message": f"Ollama API error: {str(e)}"
         }

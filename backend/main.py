@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from parser import parse_document, parse_document_with_images
 from cv_structure_parser import parse_cv_to_structured_data, apply_suggestion_to_structured_cv
 from gemini_api_structured import analyze_structured_cv_with_gemini
+from ollama_api_structured import analyze_structured_cv_with_ollama, check_ollama_connection
 from google import generativeai as genai
 import tempfile
 import os
@@ -29,10 +30,15 @@ os.makedirs(ANALYSIS_DIR, exist_ok=True)
 
 app = FastAPI()
 
-# ⚠️ IMPORTANT: Set your Gemini API key here or use environment variable
+# ⚠️ IMPORTANT: Configure your LLM settings
+# For Gemini (fallback)
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "YOUR_API_KEY_HERE")
 
-# Choose your Gemini model
+# For Ollama (primary)
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.1:8b")
+
+# Choose your Gemini model (fallback)
 GEMINI_MODEL = genai.GenerativeModel(model_name="gemini-2.5-flash")
 
 
@@ -53,10 +59,20 @@ Removed legacy /analyze endpoint. Use POST /analyze-structured instead.
 @app.get("/")
 async def root():
     """Health check endpoint"""
+    ollama_status = check_ollama_connection(OLLAMA_URL, OLLAMA_MODEL)
+    
     return {
         "status": "API is running!",
         "message": "Use POST /analyze-structured to process CVs",
-        "gemini_configured": GEMINI_API_KEY != "YOUR_API_KEY_HERE"
+        "version": "2.0.0 - Ollama Edition",
+        "llm_status": {
+            "primary": "Ollama",
+            "ollama_running": ollama_status["ollama_running"],
+            "ollama_model": OLLAMA_MODEL,
+            "model_available": ollama_status["model_available"],
+            "available_models": ollama_status.get("available_models", []),
+            "gemini_fallback_configured": GEMINI_API_KEY != "YOUR_API_KEY_HERE"
+        }
     }
 
 
@@ -118,7 +134,8 @@ async def analyze_structured(
     cv_file: UploadFile = File(None),
     cv_text: str = Form(None),
     job_description: str = Form(""),
-    use_gemini: bool = Form(True)
+    use_ollama: bool = Form(True),
+    use_gemini_fallback: bool = Form(True)
 ):
     """
     Analyze CV and return structured data with field-targeted suggestions.
@@ -189,16 +206,56 @@ async def analyze_structured(
     
     structured_cv = structured_result['structured_data']
     
-    # Step 2: Analyze structured CV with Gemini
-    gemini_analysis = None
-    if use_gemini:
-        print("🤖 Analyzing structured CV with Gemini...")
-        gemini_analysis = analyze_structured_cv_with_gemini(
+    # Step 2: Analyze structured CV with LLM
+    analysis = None
+    analysis_method = "none"
+    
+    if use_ollama:
+        print("🦙 Analyzing structured CV with Ollama...")
+        try:
+            analysis = analyze_structured_cv_with_ollama(
+                structured_cv, 
+                job_description, 
+                OLLAMA_URL,
+                OLLAMA_MODEL,
+                cv_images
+            )
+            if analysis and analysis.get('status') == 'success':
+                analysis_method = "ollama"
+                print("✅ Ollama analysis successful!")
+            else:
+                raise Exception(f"Ollama analysis failed: {analysis.get('message', 'Unknown error')}")
+        except Exception as e:
+            print(f"⚠️ Ollama analysis failed: {str(e)}")
+            if use_gemini_fallback and GEMINI_API_KEY != "YOUR_API_KEY_HERE":
+                print("🔄 Falling back to Gemini...")
+                try:
+                    analysis = analyze_structured_cv_with_gemini(
+                        structured_cv, 
+                        job_description, 
+                        GEMINI_API_KEY, 
+                        cv_images
+                    )
+                    if analysis and analysis.get('status') == 'success':
+                        analysis_method = "gemini_fallback"
+                        print("✅ Gemini fallback analysis successful!")
+                    else:
+                        print("❌ Gemini fallback also failed")
+                except Exception as gemini_error:
+                    print(f"❌ Gemini fallback failed: {str(gemini_error)}")
+            else:
+                print("❌ No fallback available or configured")
+    
+    elif use_gemini_fallback and GEMINI_API_KEY != "YOUR_API_KEY_HERE":
+        print("🤖 Analyzing structured CV with Gemini (direct)...")
+        analysis = analyze_structured_cv_with_gemini(
             structured_cv, 
             job_description, 
             GEMINI_API_KEY, 
             cv_images
         )
+        if analysis and analysis.get('status') == 'success':
+            analysis_method = "gemini_direct"
     
     # Save structured CV data
     cv_data = {
@@ -220,24 +277,41 @@ async def analyze_structured(
         print(f"❌ Error saving structured CV: {str(e)}")
     
     # Save analysis
-    if gemini_analysis and 'error' not in gemini_analysis:
+    if analysis and analysis.get('status') == 'success':
         analysis_basename = f"structured_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         analysis_filename = os.path.join(ANALYSIS_DIR, analysis_basename)
+        
+        # Add metadata about analysis method
+        analysis_with_metadata = {
+            **analysis,
+            "analysis_metadata": {
+                "method": analysis_method,
+                "timestamp": datetime.now().isoformat(),
+                "ollama_model": OLLAMA_MODEL if analysis_method.startswith("ollama") else None,
+                "gemini_used": analysis_method.startswith("gemini")
+            }
+        }
+        
         with open(analysis_filename, 'w', encoding='utf-8') as f:
-            json.dump(gemini_analysis, f, indent=2, ensure_ascii=False)
+            json.dump(analysis_with_metadata, f, indent=2, ensure_ascii=False)
         print(f"💾 Saved structured analysis to: {analysis_filename}")
     
     # Return response
     response = {
-        "summary": "CV successfully analyzed with structured data!",
+        "summary": f"CV successfully analyzed with structured data! (Analysis method: {analysis_method})",
         "status": "success",
         "structured_cv": structured_cv,
         "original_file": original_file_data,
-        "file_info": file_info if cv_file else {"source": "raw_text"}
+        "file_info": file_info if cv_file else {"source": "raw_text"},
+        "analysis_method": analysis_method
     }
     
-    if gemini_analysis:
-        response["gemini_analysis"] = gemini_analysis
+    if analysis and analysis.get('status') == 'success':
+        response["analysis"] = analysis
+        # Keep backward compatibility
+        response["gemini_analysis"] = analysis
+    elif analysis:
+        response["analysis_error"] = analysis.get('message', 'Unknown analysis error')
     
     return response
 

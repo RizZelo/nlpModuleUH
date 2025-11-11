@@ -4,8 +4,12 @@ uvicorn==0.38.0
 python-multipart==0.0.20
 python-dotenv==1.2.1
 
-# Google Gemini AI
-google-generativeai==0.8.5
+# LLM APIs
+google-generativeai==0.8.5  # Keep for fallback/compatibility
+# No additional dependencies needed for Ollama (uses requests which is already included)
+
+# System monitoring (for Ollama setup helper)
+psutil>=5.9.0
 
 # Document parsing
 PyPDF2>=3.0.0
